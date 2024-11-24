@@ -1,0 +1,23 @@
+{
+    "name": "Chinese Learning Extension",
+    "version": "0.1",
+    "manifest_version": 3,
+    "description": "TODO",
+    "background": {
+        // "scripts": [
+        //     "background-built.js"
+        // ],
+        "service_worker": "background-built.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content-built.js"
+            ],
+            "all_frames": true
+        }
+    ]
+}
