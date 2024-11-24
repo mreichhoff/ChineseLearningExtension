@@ -16,4 +16,12 @@ export default [{
         format: 'iife'
     },
     plugins: [json(), nodeResolve()]
+},
+{
+    input: 'js/side-panel.js',
+    output: {
+        file: 'side-panel-built.js',
+        format: 'iife'
+    },
+    plugins: [json(), nodeResolve()]
 }];

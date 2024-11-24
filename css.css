@@ -1,3 +1,19 @@
+:root {
+    --chineselearningextension-background-color: #fff;
+    --chineselearningextension-font-color: #000;
+    --chineselearningextension-button-background-color: #121212;
+    --chineselearningextension-button-font-color: #eee;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --chineselearningextension-background-color: #121212;
+        --chineselearningextension-font-color: #eeee;
+        --chineselearningextension-button-background-color: #cccc;
+        --chineselearningextension-button-font-color: #121212;
+    }
+}
+
 .chineselearningextension-definition-pinyin {
     font-weight: bold;
 }
@@ -9,10 +25,15 @@
 .chineselearningextension-definitions {
     font-size: 16px;
     list-style: none;
+    padding: 0;
 }
 
 .chineselearningextension-popover {
+    /* without this, the anchor positioning does not work for the popover */
+    /* see the inset: auto note in https://developer.chrome.com/blog/anchor-positioning-api */
     inset: auto;
+    background-color: var(--chineselearningextension-background-color);
+    color: var(--chineselearningextension-font-color);
     width: 500px;
     padding: 8px;
     border-radius: 12px;
@@ -29,8 +50,28 @@
 }
 
 .chineselearningextension-popover-header {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     margin: 4px;
     padding: 0;
+}
+
+.chineselearningextension-learn-more-button {
+    border: none;
+    font-size: 18px;
+    background-color: var(--chineselearningextension-button-background-color);
+    color: var(--chineselearningextension-button-font-color);
+    border-radius: 12px;
+    padding: 0 8px;
+    float: right;
+    cursor: pointer;
+}
+
+.chineselearningextension-side-panel {
+    background-color: var(--chineselearningextension-background-color);
+    color: var(--chineselearningextension-font-color);
+}
+
+.chineselearningextension-side-panel-header {
+    text-align: center;
 }

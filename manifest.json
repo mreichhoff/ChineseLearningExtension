@@ -4,10 +4,15 @@
     "manifest_version": 3,
     "description": "TODO",
     "background": {
-        // "scripts": [
-        //     "background-built.js"
-        // ],
         "service_worker": "background-built.js"
+    },
+    "permissions": [
+        "activeTab",
+        "sidePanel",
+        "storage"
+    ],
+    "side_panel": {
+        "default_path": "side-panel.html"
     },
     "content_scripts": [
         {

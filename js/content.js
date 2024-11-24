@@ -1,5 +1,6 @@
 import { pinyin } from "../data/definitions.js";
 import { html, render } from 'lit-html';
+import { renderDictionary } from "./dictionary.js"
 
 let modifications = [];
 
@@ -19,77 +20,17 @@ function processNode(node) {
     }
 }
 
-function parseDefinitions(definitionList) {
-    let parsedDefinitions = {};
-    for (const item of definitionList) {
-        // TODO: I goofed...
-        // definitions format should be:
-        // key: word (or character)
-        // val: [{pinyin: a, definitions: [a,b,c], measure: [a,b,c]}...]
-        // this would better match cedict's format
-        // could consider combining simplified and trad, but separating for
-        // the purpose of sentences seems better
-        // should also verify this format...
-        const key = item.pinyin;
-        if (!(key in parsedDefinitions)) {
-            parsedDefinitions[key] = [item];
-        } else {
-            parsedDefinitions[key].push(item);
-        }
-    }
-    return parsedDefinitions;
-}
-
 const popover = document.createElement('div');
 popover.classList.add('chineselearningextension-popover');
 popover.popover = 'auto';
 document.body.appendChild(popover);
 
 function getToneColor(tone) {
-    return tone === '1' ? '#eb3434' : tone === '2' ? 'green' : tone === '3' ? '#8f34eb' : tone === '4' ? '#345eeb' : '#333';
-}
-function renderPinyin(pinyin) {
-    const pinyinTemplates = [];
-    const syllables = pinyin.split(' ');
-    syllables.forEach(syllable => {
-        pinyinTemplates.push(
-            html`<span class="chineselearningextension-definition-pinyin" style="color:${getToneColor(syllable[syllable.length - 1])}">
-                ${syllable}
-            </span>`
-        );
-    });
-    return pinyinTemplates;
+    return tone === '1' ? '#eb3434' : tone === '2' ? 'green' : tone === '3' ? '#8f34eb' : tone === '4' ? '#68aaee' : '#333';
 }
 
-function renderDefinitions(definitions) {
-    const definitionTemplates = [];
-    definitions.forEach((definition, index) => {
-        definitionTemplates.push(
-            html`<span>
-                <span class="chineselearningextension-definition-number">${index + 1}:</span>
-                <span>${definition.en}</span>
-            </span>`
-        );
-    });
-    return definitionTemplates;
-}
-
-function renderDictionary(word, parsedDefinitions, container) {
-    const itemTemplates = [];
-    Object.entries(parsedDefinitions).forEach(([pinyin, definitions]) => {
-        const pinyinTemplates = renderPinyin(pinyin);
-        const definitionTemplates = renderDefinitions(definitions);
-        itemTemplates.push(
-            html`<li class="chineselearningextension-definition-item">
-                ${pinyinTemplates}
-                ${definitionTemplates}
-            </li>`);
-    });
-    const template = html`<div>
-            <h2 class="chineselearningextension-popover-header">${word}</h2>
-        </div>
-        <ul class="chineselearningextension-definitions">${itemTemplates}</ul>`;
-    render(template, container);
+function openSidePanel(word) {
+    chrome.runtime.sendMessage({ type: 'open-learn-more', word });
 }
 
 // TODO: either add more fix-up logic (e.g., manually split 日出生 into [日,出生], or find other tokenizer)
@@ -158,16 +99,18 @@ modifications.forEach(mod => {
                 i++;
             }
             wrapper.addEventListener('mouseenter', async function () {
-                const response = await chrome.runtime.sendMessage({ word: segment.segment });
+                const response = await chrome.runtime.sendMessage({ type: 'definitions', word: segment.segment });
                 if (!response.definitions) {
                     return;
                 }
                 cancelHidePopover();
                 const oldAnchors = document.getElementsByClassName('chineselearningextension-definition-anchor');
+                // clear any elements that have the CSS anchor in preparation for setting the hovered element to one
                 Array.from(oldAnchors).forEach(element => element.classList.remove('chineselearningextension-definition-anchor'));
                 wrapper.classList.add('chineselearningextension-definition-anchor');
-                const parsedDefinitions = parseDefinitions(response.definitions);
-                renderDictionary(segment.segment, parsedDefinitions, popover);
+                // renders popover with a CSS Anchor class
+                // TODO: x-browser support as it becomes available?
+                renderDictionary(segment.segment, response.definitions, popover, openSidePanel);
                 popover.showPopover();
             });
             wrapper.addEventListener('mouseleave', function () {
