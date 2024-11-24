@@ -17,6 +17,9 @@
             "js": [
                 "content-built.js"
             ],
+            "css": [
+                "css.css"
+            ],
             "all_frames": true
         }
     ]

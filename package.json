@@ -1,6 +1,8 @@
 {
     "private": true,
-    "dependencies": {},
+    "dependencies": {
+        "lit-html": "^3.2.1"
+    },
     "jshintConfig": {
         "esversion": 9
     },
