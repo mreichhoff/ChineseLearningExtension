@@ -24,4 +24,12 @@ export default [{
         format: 'iife'
     },
     plugins: [json(), nodeResolve()]
+},
+{
+    input: 'js/options.js',
+    output: {
+        file: 'options-built.js',
+        format: 'iife'
+    },
+    plugins: [json(), nodeResolve()]
 }];

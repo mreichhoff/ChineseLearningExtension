@@ -58,7 +58,7 @@
 
 .chineselearningextension-learn-more-button {
     border: none;
-    font-size: 18px;
+    font-size: 16px;
     background-color: var(--chineselearningextension-button-background-color);
     color: var(--chineselearningextension-button-font-color);
     border-radius: 12px;
@@ -74,4 +74,18 @@
 
 .chineselearningextension-side-panel-header {
     text-align: center;
+}
+
+.chinese-learning-extension-audio-button {
+    border: none;
+    font-size: 16px;
+    background-color: var(--chineselearningextension-button-background-color);
+    color: var(--chineselearningextension-button-font-color);
+    border-radius: 12px;
+    padding: 0 8px;
+}
+
+.chineselearningextension-result-message {
+    font-size: 18px;
+    font-weight: bold;
 }
