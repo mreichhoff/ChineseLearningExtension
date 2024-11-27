@@ -51,7 +51,8 @@ function renderDefinitions(definitions) {
     return definitionTemplates;
 }
 
-function renderDictionary(word, definitions, container, callback) {
+// TODO: make more generic, no popover or side-panel specifics
+function getDictionaryTemplate(word, definitions, callback) {
     const parsedDefinitions = parseDefinitions(definitions);
     const itemTemplates = [];
     Object.entries(parsedDefinitions).forEach(([pinyin, definitions]) => {
@@ -73,7 +74,7 @@ function renderDictionary(word, definitions, container, callback) {
             </h2>
         </div>
         <ul class="chineselearningextension-definitions">${itemTemplates}</ul>`;
-    render(template, container);
+    return template;
 }
 
-export { renderDictionary }
+export { getDictionaryTemplate, parseDefinitions }

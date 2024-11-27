@@ -1,9 +1,11 @@
 import { html, render } from 'lit-html';
-import { renderDictionary } from './dictionary';
+import { getDictionaryTemplate } from './dictionary';
+import { getAnkiTemplate, CardType } from "./anki";
 import { callForvo } from "./forvo-client"
 
 const definitionContainer = document.getElementById('side-panel-definition-container');
 const audioContainer = document.getElementById('side-panel-audio-container');
+
 let currentForvoKey;
 let currentWord;
 let audioElement;
@@ -14,19 +16,24 @@ chrome.storage.session.get('word', async ({ word }) => {
     if (!response.definitions) {
         return;
     }
-    renderDictionary(currentWord, response.definitions, definitionContainer);
+    renderDefinitionsSection(currentWord, response.definitions);
 });
 
 async function renderAudioButton() {
     if (currentForvoKey) {
-        const audioPath = await callForvo(currentWord, currentForvoKey);
-        if (!audioPath) {
+        const audioUrl = await callForvo(currentWord, currentForvoKey);
+        if (!audioUrl) {
             return;
         }
         audioElement = document.createElement('audio');
         audioElement.crossOrigin = 'anonymous';
-        audioElement.src = audioPath;
+        audioElement.src = audioUrl;
         audioElement.load();
+        const ankiSection = await getAnkiTemplate(currentWord, { audioUrl }, CardType.Audio);
+        render(html`<button class="chinese-learning-extension-audio-button" @click=${playAudio}>Listen</button>
+            <div><h3>Add audio to Anki?</h3>
+            <div>${ankiSection}</div>`, audioContainer);
+        return;
     }
     // TODO: make clear to users the source of audio (forvo vs web speech api vs other)
     render(html`<button class="chinese-learning-extension-audio-button" @click=${playAudio}>Listen</button>`, audioContainer);
@@ -51,9 +58,15 @@ chrome.storage.session.onChanged.addListener(async (changes) => {
         return;
     }
     audioElement = null;
-    renderDictionary(currentWord, response.definitions, definitionContainer);
+    await renderDefinitionsSection(currentWord, response.definitions);
     renderAudioButton();
 });
+
+async function renderDefinitionsSection(currentWord, definitions) {
+    const dictionaryTemplate = getDictionaryTemplate(currentWord, definitions);
+    const ankiTemplate = await getAnkiTemplate(currentWord, { definitions }, CardType.Definition);
+    render(html`<div>${dictionaryTemplate}</div><h3>Add definition to Anki?</h3><div>${ankiTemplate}</div>`, definitionContainer);
+}
 
 function playAudio() {
     // could also build in some kind of pending forvo promise thing, but for now just quickly fall back to

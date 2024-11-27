@@ -34,14 +34,14 @@
     inset: auto;
     background-color: var(--chineselearningextension-background-color);
     color: var(--chineselearningextension-font-color);
-    width: 500px;
+    width: 400px;
     padding: 8px;
     border-radius: 12px;
     border: 1px solid #333;
     position-anchor: --anchor;
     position: absolute;
     top: anchor(bottom);
-    left: anchor(left);
+    justify-self: anchor-center;
     text-align: left;
 }
 
@@ -56,6 +56,7 @@
     padding: 0;
 }
 
+.chineselearningextension-anki-button,
 .chineselearningextension-learn-more-button {
     border: none;
     font-size: 16px;
@@ -63,8 +64,11 @@
     color: var(--chineselearningextension-button-font-color);
     border-radius: 12px;
     padding: 0 8px;
-    float: right;
     cursor: pointer;
+}
+
+.chineselearningextension-learn-more-button {
+    float: right;
 }
 
 .chineselearningextension-side-panel {

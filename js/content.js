@@ -1,6 +1,6 @@
 import { pinyin } from "../data/definitions.js";
 import { html, render } from 'lit-html';
-import { renderDictionary } from "./dictionary.js"
+import { getDictionaryTemplate } from "./dictionary.js"
 
 let modifications = [];
 
@@ -110,10 +110,11 @@ modifications.forEach(mod => {
                 wrapper.classList.add('chineselearningextension-definition-anchor');
                 // renders popover with a CSS Anchor class
                 // TODO: x-browser support as it becomes available?
-                renderDictionary(segment.segment, response.definitions, popover, openSidePanel);
+                render(getDictionaryTemplate(segment.segment, response.definitions, openSidePanel), popover);
                 popover.showPopover();
             });
             wrapper.addEventListener('mouseleave', function () {
+
                 triggerHidePopover();
             });
             mod.parent.insertBefore(wrapper, mod.nextSibling);
