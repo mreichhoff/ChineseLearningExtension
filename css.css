@@ -9,7 +9,7 @@
     :root {
         --chineselearningextension-background-color: #121212;
         --chineselearningextension-font-color: #eeee;
-        --chineselearningextension-button-background-color: #cccc;
+        --chineselearningextension-button-background-color: #eee;
         --chineselearningextension-button-font-color: #121212;
     }
 }
@@ -92,4 +92,27 @@
 .chineselearningextension-result-message {
     font-size: 18px;
     font-weight: bold;
+}
+
+.target-sentence {
+    font-size: 18px;
+}
+
+.pinyin {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.translation {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+p.target-sentence,
+p.pinyin {
+    margin: 6px 0
+}
+
+p.translation {
+    margin: 4px 0 16px 0
 }

@@ -1,4 +1,4 @@
-import { pinyin } from "../data/definitions.js";
+import { pinyin } from "../data/pinyin.js";
 import { html, render } from 'lit-html';
 import { getDictionaryTemplate } from "./dictionary.js"
 

@@ -2,9 +2,11 @@ import { html, render } from 'lit-html';
 import { getDictionaryTemplate } from './dictionary';
 import { getAnkiTemplate, CardType } from "./anki";
 import { callForvo } from "./forvo-client"
+import { getSentencesTemplate } from './example-sentences';
 
 const definitionContainer = document.getElementById('side-panel-definition-container');
 const audioContainer = document.getElementById('side-panel-audio-container');
+const sentencesContainer = document.getElementById('sentences-container');
 
 let currentForvoKey;
 let currentWord;
@@ -17,6 +19,7 @@ chrome.storage.session.get('word', async ({ word }) => {
         return;
     }
     renderDefinitionsSection(currentWord, response.definitions);
+    renderSentencesSection(currentWord);
 });
 
 async function renderAudioButton() {
@@ -60,6 +63,7 @@ chrome.storage.session.onChanged.addListener(async (changes) => {
     audioElement = null;
     await renderDefinitionsSection(currentWord, response.definitions);
     renderAudioButton();
+    renderSentencesSection(currentWord);
 });
 
 async function renderDefinitionsSection(currentWord, definitions) {
@@ -87,3 +91,8 @@ chrome.storage.session.get('forvoKey', async ({ forvoKey }) => {
     currentForvoKey = forvoKey;
     renderAudioButton();
 });
+
+async function renderSentencesSection(word) {
+    const sentencesTemplate = await getSentencesTemplate(word);
+    render(sentencesTemplate, sentencesContainer);
+}
