@@ -4,6 +4,7 @@
     --chineselearningextension-button-background-color: #121212;
     --chineselearningextension-button-font-color: #eee;
     --chineselearningextension-border-color: #3333;
+    --chineselearningextension-link-color: #0083ff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -13,6 +14,7 @@
         --chineselearningextension-button-background-color: #eee;
         --chineselearningextension-button-font-color: #121212;
         --chineselearningextension-border-color: #9999;
+        --chineselearningextension-link-color: #0ff;
     }
 }
 
@@ -141,4 +143,23 @@ h2.tab.active {
 
 #deck-selector {
     margin-top: 16px;
+}
+
+.chineselearningextension-link-list {
+    list-style: none;
+    margin: 12px 0;
+    padding: 0;
+    font-size: 16px;
+}
+
+.chineselearningextension-link-item {
+    margin: 12px 0;
+}
+
+.chineselearningextension-emphasized {
+    font-weight: bold;
+}
+
+.chineselearningextension-external-link {
+    color: var(--chineselearningextension-link-color);
 }

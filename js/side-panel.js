@@ -3,6 +3,7 @@ import { getDictionaryTemplate } from './dictionary';
 import { getAnkiTemplate, CardType, fetchAnkiDecks } from "./anki";
 import { callForvo } from "./forvo-client"
 import { getSentencesTemplate } from './example-sentences';
+import { renderExternalLinks } from './links';
 
 const definitionContainer = document.getElementById('side-panel-definition-container');
 const audioContainer = document.getElementById('side-panel-audio-container');
@@ -52,6 +53,7 @@ chrome.storage.session.get('word', async ({ word }) => {
     currentAnkiDecks = await fetchAnkiDecks();
     renderDefinitionsSection(currentWord, response.definitions);
     renderSentencesSection(currentWord);
+    render(renderExternalLinks(currentWord), linksContainer);
     renderDeckSelector(currentAnkiDecks);
 });
 
@@ -97,6 +99,7 @@ chrome.storage.session.onChanged.addListener(async (changes) => {
     renderDefinitionsSection(currentWord, response.definitions);
     renderAudioButton();
     renderSentencesSection(currentWord);
+    render(renderExternalLinks(currentWord), linksContainer);
     renderDeckSelector(currentAnkiDecks);
 });
 
