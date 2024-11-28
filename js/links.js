@@ -28,7 +28,7 @@ function renderExternalLinks(word) {
     <ul class="chineselearningextension-link-list">${Object.entries(linkSources).map(([linkName, linkData]) => {
         return html`<li class="chineselearningextension-link-item">
         Get <span class="chineselearningextension-emphasized">${linkData.description}</span> on
-        <a class="chineselearningextension-external-link" href="${linkData.linkTemplate(encodeURIComponent(word))}">${linkName}</a></li>`
+        <a target="_blank" class="chineselearningextension-external-link" href="${linkData.linkTemplate(encodeURIComponent(word))}">${linkName}</a></li>`
     })}</ul>`;
 }
 
