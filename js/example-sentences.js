@@ -1,4 +1,5 @@
 import { html } from 'lit-html';
+import { getAnkiTemplate, CardType } from './anki';
 
 let sentences;
 
@@ -14,17 +15,18 @@ async function getSentences(word) {
     return sentences[word] || [];
 }
 
-async function getSentencesTemplate(word) {
+async function getSentencesTemplate(word, currentAnkiDecks) {
     const sentencesForWord = await getSentences(word);
     if (!sentencesForWord || sentencesForWord.length === 0) {
         return html`Sorry, no sentences found.`
     }
-    return html`${sentencesForWord.map((sentence) =>
-        html`<div class="example-sentence">
+    return html`${sentencesForWord.map((sentence, index) =>
+        html`<div><div class="example-sentence">
             <p class="target-sentence">${sentence.zh.join('')}</p>
             <p class="pinyin">${sentence.pinyin}</p>
             <p class="translation">${sentence.en}</p>
-        </div>`
+        </div>
+        ${getAnkiTemplate(word, { sentence }, CardType.Sentence, currentAnkiDecks)}</div>`
     )}`;
 }
 

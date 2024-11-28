@@ -95,7 +95,37 @@ async function makeAudioCard(word, audioUrl, deck) {
             }
         }
     };
-    callAnkiConnect(requestBody)
+    callAnkiConnect(requestBody);
+}
+
+async function makeSentenceCard(word, sentence, deck) {
+    const requestBody = {
+        "action": "addNote",
+        "version": 6,
+        "params": {
+            "note": {
+                "deckName": deck,
+                "modelName": "Basic",
+                "fields": {
+                    "Front": sentence.zh.join(''),
+                    "Back": `${sentence.en} (${sentence.pinyin}); example of ${word}`
+                },
+                "options": {
+                    "allowDuplicate": false,
+                    "duplicateScope": "deck",
+                    "duplicateScopeOptions": {
+                        "deckName": deck,
+                        "checkChildren": false,
+                        "checkAllModels": false
+                    }
+                },
+                "tags": [
+                    "ChineseLearningExtension"
+                ]
+            }
+        }
+    };
+    callAnkiConnect(requestBody);
 }
 
 async function callAnkiConnect(request) {
@@ -109,10 +139,11 @@ async function callAnkiConnect(request) {
 
 const CardType = {
     Audio: 'audio',
-    Definition: 'definition'
+    Definition: 'definition',
+    Sentence: 'sentence'
 };
-async function getAnkiTemplate(word, cardRequest, cardType) {
-    const ankiDecks = await fetchAnkiDecks();
+
+function getAnkiTemplate(word, cardRequest, cardType, ankiDecks) {
     if (!ankiDecks || ankiDecks.length < 1) {
         return '';
     }
@@ -122,7 +153,7 @@ async function getAnkiTemplate(word, cardRequest, cardType) {
         </select></label>`;
 
     let disabled = false;
-    return html`<div><div class="chineselearningextension-result-message"></div>
+    return html`<h3>Add ${cardType} to Anki?</h3><div><div class="chineselearningextension-result-message"></div>
             ${deckSelector}
             <button @click=${async function (e) {
             if (disabled) {
@@ -138,6 +169,8 @@ async function getAnkiTemplate(word, cardRequest, cardType) {
                     await makeAudioCard(word, cardRequest.audioUrl, deck);
                 } else if (cardType === CardType.Definition) {
                     await makeDefinitionCard(word, cardRequest.definitions, deck);
+                } else if (cardType === CardType.Sentence) {
+                    await makeSentenceCard(word, cardRequest.sentence, deck);
                 }
                 statusElement.innerText = `Successfully added ${word} ${cardType} to ${deck}.`;
                 setTimeout(function () {
@@ -154,4 +187,4 @@ async function getAnkiTemplate(word, cardRequest, cardType) {
     </div>`;
 }
 
-export { getAnkiTemplate, CardType }
+export { getAnkiTemplate, fetchAnkiDecks, CardType }
