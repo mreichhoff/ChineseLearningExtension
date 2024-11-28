@@ -33,7 +33,65 @@ function openSidePanel(word) {
     chrome.runtime.sendMessage({ type: 'open-learn-more', word });
 }
 
-// TODO: either add more fix-up logic (e.g., manually split 日出生 into [日,出生], or find other tokenizer)
+// oh no, what have i done
+function hackAroundDictionaryTokenizerMismatch(segments) {
+    let result = [];
+    Array.from(segments).forEach(segmentObj => {
+        const segment = segmentObj.segment;
+        if (segment in pinyin) {
+            result.push(segment);
+            return;
+        }
+        if (segment.length === 2) {
+            if (segment[0] in pinyin && segment[1] in pinyin) {
+                result.push(segment[0]);
+                result.push(segment[1]);
+                return;
+            }
+        }
+        if (segment.length === 3) {
+            let first = segment[0];
+            let last = segment.substring(1);
+            if (first in pinyin && last in pinyin) {
+                result.push(first);
+                result.push(last);
+                return;
+            }
+            first = segment.substring(0, 2);
+            last = segment.substring(2);
+            if (first in pinyin && last in pinyin) {
+                result.push(first);
+                result.push(last);
+                return;
+            }
+            if (segment[0] in pinyin && segment[1] in pinyin && segment[2] in pinyin) {
+                result.push(segment[0]);
+                result.push(segment[1]);
+                result.push(segment[2]);
+                return;
+            }
+        }
+        if (segment.length === 4) {
+            let first = segment.substring(0, 2);
+            let last = segment.substring(2);
+            if (first in pinyin && last in pinyin) {
+                result.push(first);
+                result.push(last);
+                return;
+            }
+            if (segment[0] in pinyin && segment[1] in pinyin && segment[2] in pinyin && segment[3] in pinyin) {
+                result.push(segment[0]);
+                result.push(segment[1]);
+                result.push(segment[2]);
+                result.push(segment[3]);
+                return;
+            }
+        }
+        // if we've reached this point, there's not a clear fixup. Just add the segment.
+        result.push(segment);
+    });
+    return result;
+}
 function allHaveTones(word) {
     for (const character of word) {
         if (!pinyin[character]) {
@@ -80,17 +138,18 @@ modifications.forEach(mod => {
     const fullText = mod.node.textContent;
     const segmenter = new Intl.Segmenter("zh-CN", { granularity: "word" });
     const segments = segmenter.segment(fullText);
+    const segmentsAdjustedForDictionary = hackAroundDictionaryTokenizerMismatch(segments);
     // TODO: syntactic sugar
-    Array.from(segments).forEach(segment => {
-        let tones = pinyin[segment.segment];
-        if (!tones && allHaveTones(segment.segment)) {
-            tones = overrideTones(segment.segment);
+    segmentsAdjustedForDictionary.forEach(segment => {
+        let tones = pinyin[segment];
+        if (!tones && allHaveTones(segment)) {
+            tones = overrideTones(segment);
         }
         const wrapper = document.createElement('span');
         if (tones) {
             let i = 0;
             // TODO: use lit templates
-            for (const character of segment.segment) {
+            for (const character of segment) {
                 const coloredSpan = document.createElement('span');
                 coloredSpan.innerText = character;
                 const tone = tones[i];
@@ -99,7 +158,7 @@ modifications.forEach(mod => {
                 i++;
             }
             wrapper.addEventListener('mouseenter', async function () {
-                const response = await chrome.runtime.sendMessage({ type: 'definitions', word: segment.segment });
+                const response = await chrome.runtime.sendMessage({ type: 'definitions', word: segment });
                 if (!response.definitions) {
                     return;
                 }
@@ -110,16 +169,15 @@ modifications.forEach(mod => {
                 wrapper.classList.add('chineselearningextension-definition-anchor');
                 // renders popover with a CSS Anchor class
                 // TODO: x-browser support as it becomes available?
-                render(getDictionaryTemplate(segment.segment, response.definitions, openSidePanel), popover);
+                render(getDictionaryTemplate(segment, response.definitions, openSidePanel), popover);
                 popover.showPopover();
             });
             wrapper.addEventListener('mouseleave', function () {
-
                 triggerHidePopover();
             });
             mod.parent.insertBefore(wrapper, mod.nextSibling);
         } else {
-            wrapper.innerText = segment.segment;
+            wrapper.innerText = segment;
             mod.parent.insertBefore(wrapper, mod.nextSibling);
         }
     });
