@@ -15,10 +15,10 @@ const tabContainer = document.getElementById('tabs');
 const mainHeaderContainer = document.getElementById('main-header-container');
 
 const tabToPanel = {
-    'tab-definition': ['Definition', definitionContainer],
-    'tab-pronunciation': ['Audio', audioContainer],
-    'tab-sentences': ['Sentences', sentencesContainer],
-    'tab-links': ['Links', linksContainer]
+    'tab-definition': ['Definition', definitionContainer, () => !!definitionContainer.querySelector('.chineselearningextension-definition-item')],
+    'tab-pronunciation': ['Audio', audioContainer, () => true],
+    'tab-sentences': ['Sentences', sentencesContainer, () => !!sentencesContainer.querySelector('.example-sentence')],
+    'tab-links': ['Links', linksContainer, () => false]
 };
 
 render(html`<h1 class="side-panel-header">Learn More</h1>`, mainHeaderContainer);
@@ -34,6 +34,11 @@ function switchToTab(desiredTabId) {
         } else {
             document.getElementById(tab[0]).classList.add('active');
             tab[1][1].removeAttribute('style');
+            if (tab[1][2]()) {
+                deckSelectorContainer.removeAttribute('style');
+            } else {
+                deckSelectorContainer.style.display = 'none';
+            }
         }
     });
 }
