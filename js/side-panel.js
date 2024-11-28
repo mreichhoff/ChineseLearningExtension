@@ -7,6 +7,7 @@ import { getSentencesTemplate } from './example-sentences';
 const definitionContainer = document.getElementById('side-panel-definition-container');
 const audioContainer = document.getElementById('side-panel-audio-container');
 const sentencesContainer = document.getElementById('sentences-container');
+const deckSelectorContainer = document.getElementById('deck-selector');
 
 let currentForvoKey;
 let currentWord;
@@ -22,6 +23,7 @@ chrome.storage.session.get('word', async ({ word }) => {
     currentAnkiDecks = await fetchAnkiDecks();
     renderDefinitionsSection(currentWord, response.definitions);
     renderSentencesSection(currentWord);
+    renderDeckSelector(currentAnkiDecks);
 });
 
 async function renderAudioButton() {
@@ -35,7 +37,7 @@ async function renderAudioButton() {
         audioElement.src = audioUrl;
         audioElement.load();
         render(html`<button class="chinese-learning-extension-audio-button" @click=${playAudio}>Listen</button>
-            <div>${getAnkiTemplate(currentWord, { audioUrl }, CardType.Audio, currentAnkiDecks)}</div>`, audioContainer);
+            <div>${getAnkiTemplate(currentWord, { audioUrl }, CardType.Audio, getDeckSelectionCallback())}</div>`, audioContainer);
         return;
     }
     // TODO: make clear to users the source of audio (forvo vs web speech api vs other)
@@ -65,12 +67,37 @@ chrome.storage.session.onChanged.addListener(async (changes) => {
     await renderDefinitionsSection(currentWord, response.definitions);
     renderAudioButton();
     renderSentencesSection(currentWord);
+    renderDeckSelector(currentAnkiDecks);
 });
 
 async function renderDefinitionsSection(currentWord, definitions) {
     const dictionaryTemplate = getDictionaryTemplate(currentWord, definitions);
     render(html`<div>${dictionaryTemplate}</div>
-        <div>${getAnkiTemplate(currentWord, { definitions }, CardType.Definition, currentAnkiDecks)}</div>`, definitionContainer);
+        <div>${getAnkiTemplate(currentWord, { definitions }, CardType.Definition, getDeckSelectionCallback())}</div>`, definitionContainer);
+}
+
+function getDeckSelectionCallback() {
+    if(!currentAnkiDecks || currentAnkiDecks.length < 1) {
+        return null;
+    }
+    return deckSelection;
+}
+
+function deckSelection() {
+    const selector = deckSelectorContainer.querySelector('select');
+    if (!selector) {
+        return null;
+    }
+    return selector.value;
+}
+function renderDeckSelector(decks) {
+    if (!decks || decks.length < 1) {
+        return;
+    }
+    render(html`<label>Choose Anki deck to add to: <select>
+        ${currentAnkiDecks.map((deck) =>
+            html`<option value="${deck[0]}">${deck[0]}</option>`)}
+            </select></label>`, deckSelectorContainer);
 }
 
 function playAudio() {
@@ -94,6 +121,6 @@ chrome.storage.session.get('forvoKey', async ({ forvoKey }) => {
 });
 
 async function renderSentencesSection(word) {
-    const sentencesTemplate = await getSentencesTemplate(word, currentAnkiDecks);
+    const sentencesTemplate = await getSentencesTemplate(word, getDeckSelectionCallback());
     render(sentencesTemplate, sentencesContainer);
 }

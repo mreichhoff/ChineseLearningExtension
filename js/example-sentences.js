@@ -15,7 +15,7 @@ async function getSentences(word) {
     return sentences[word] || [];
 }
 
-async function getSentencesTemplate(word, currentAnkiDecks) {
+async function getSentencesTemplate(word, deckSelectionCallback) {
     const sentencesForWord = await getSentences(word);
     if (!sentencesForWord || sentencesForWord.length === 0) {
         return html`Sorry, no sentences found.`
@@ -26,7 +26,7 @@ async function getSentencesTemplate(word, currentAnkiDecks) {
             <p class="pinyin">${sentence.pinyin}</p>
             <p class="translation">${sentence.en}</p>
         </div>
-        ${getAnkiTemplate(word, { sentence }, CardType.Sentence, currentAnkiDecks)}</div>`
+        ${getAnkiTemplate(word, { sentence }, CardType.Sentence, deckSelectionCallback)}</div>`
     )}`;
 }
 

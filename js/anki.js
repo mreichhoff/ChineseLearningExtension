@@ -143,18 +143,13 @@ const CardType = {
     Sentence: 'sentence'
 };
 
-function getAnkiTemplate(word, cardRequest, cardType, ankiDecks) {
-    if (!ankiDecks || ankiDecks.length < 1) {
+function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
+    if (!deckSelectionCallback) {
         return '';
     }
-    const deckSelector = html`<label>Deck: <select>
-        ${ankiDecks.map((deck) =>
-        html`<option value="${deck[0]}">${deck[0]}</option>`)}
-        </select></label>`;
 
     let disabled = false;
     return html`<h3>Add ${cardType} to Anki?</h3><div><div class="chineselearningextension-result-message"></div>
-            ${deckSelector}
             <button @click=${async function (e) {
             if (disabled) {
                 return;
@@ -162,7 +157,7 @@ function getAnkiTemplate(word, cardRequest, cardType, ankiDecks) {
             disabled = true;
             const parent = e.target.parentNode;
             // TODO: we code good
-            const deck = parent.querySelector('select').value;
+            const deck = deckSelectionCallback();
             const statusElement = parent.querySelector('.chineselearningextension-result-message');
             try {
                 if (cardType === CardType.Audio) {
