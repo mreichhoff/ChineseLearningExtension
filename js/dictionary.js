@@ -22,7 +22,7 @@ function parseDefinitions(definitionList) {
 }
 
 function getToneColor(tone) {
-    return tone === '1' ? '#eb3434' : tone === '2' ? 'green' : tone === '3' ? '#8f34eb' : tone === '4' ? '#68aaee' : '#333';
+    return tone === '1' ? '#ff635f' : tone === '2' ? '#66c42b' : tone === '3' ? '#de68ee' : tone === '4' ? '#68aaee' : '#888';
 }
 
 function renderPinyin(pinyin) {
@@ -77,4 +77,4 @@ function getDictionaryTemplate(word, definitions, callback) {
     return template;
 }
 
-export { getDictionaryTemplate, parseDefinitions }
+export { getDictionaryTemplate, parseDefinitions, getToneColor }

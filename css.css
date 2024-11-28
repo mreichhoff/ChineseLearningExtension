@@ -5,6 +5,7 @@
     --chineselearningextension-button-font-color: #eee;
     --chineselearningextension-border-color: #3333;
     --chineselearningextension-link-color: #0083ff;
+
 }
 
 @media (prefers-color-scheme: dark) {
@@ -33,8 +34,6 @@
 }
 
 .chineselearningextension-popover {
-    /* without this, the anchor positioning does not work for the popover */
-    /* see the inset: auto note in https://developer.chrome.com/blog/anchor-positioning-api */
     inset: auto;
     background-color: var(--chineselearningextension-background-color);
     color: var(--chineselearningextension-font-color);
@@ -42,15 +41,8 @@
     padding: 8px;
     border-radius: 12px;
     border: 1px solid #333;
-    position-anchor: --anchor;
-    position: absolute;
-    top: anchor(bottom);
-    justify-self: anchor-center;
     text-align: left;
-}
-
-.chineselearningextension-definition-anchor {
-    anchor-name: --anchor;
+    position: absolute;
 }
 
 .chineselearningextension-popover-header {
