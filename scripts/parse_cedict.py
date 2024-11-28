@@ -69,11 +69,49 @@ def main():
         '--dict-filename', help='the dictionary filename, currently compatible with cedict')
     parser.add_argument(
         '--character-type', help='simplified or traditional characters')
+    parser.add_argument('--graph-filename', help='A graph for the specific character type to allow ordering')
 
     args = parser.parse_args()
 
     result = get_dictionary_entries(
         args.dict_filename, args.character_type, (get_allowlist(args.allowlist_filename) if args.allowlist_filename else None))
+    
+    graph = {}
+    with open(args.graph_filename) as f:
+        graph = json.load(f)
+
+    # sigh....
+    dont_reorder_list = {'了', '更'}
+    for word, definitions in result.items():
+        if len(word) > 1 or (word not in graph) or (word not in result) or (word in dont_reorder_list):
+            continue
+        pinyin_options = {item['pinyin'] for item in result[word]}
+        if len(pinyin_options) < 2:
+            continue
+        words_in_graph = [value['words']
+                          for value in graph[word]['edges'].values()]
+        all_definitions = {item: result[item]
+                           for sublist in words_in_graph for item in sublist if item in result}
+        all_pinyin = {key: [item['pinyin'] for item in value]
+                      for key, value in all_definitions.items()}
+        pinyin_counts = {pinyin: 0 for pinyin in pinyin_options}
+        # oh no, what have i done
+        for key, value in all_pinyin.items():
+            index = 0
+            indices = []
+            for character in key:
+                if character == word:
+                    indices.append(index)
+                index += 1
+            for p in value:
+                syllables = p.split(' ')
+                for i in indices:
+                    if syllables[i] not in pinyin_counts:
+                        continue
+                    pinyin_counts[syllables[i]] += 1
+        definitions.sort(
+            key=lambda definition: pinyin_counts[definition['pinyin']], reverse=True)
+
     print(json.dumps(result, ensure_ascii=False))
 
 
