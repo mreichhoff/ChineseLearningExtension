@@ -53,14 +53,19 @@
 }
 
 .chineselearningextension-anki-button,
+.chinese-learning-extension-audio-button,
 .chineselearningextension-learn-more-button {
     border: none;
     font-size: 16px;
     background-color: var(--chineselearningextension-button-background-color);
     color: var(--chineselearningextension-button-font-color);
-    border-radius: 12px;
-    padding: 0 8px;
+    border-radius: 8px;
+    padding: 2px 8px;
     cursor: pointer;
+}
+
+.anki-section-header {
+    font-size: 14px;
 }
 
 .chineselearningextension-learn-more-button {
@@ -76,31 +81,21 @@
     text-align: center;
 }
 
-.chinese-learning-extension-audio-button {
-    border: none;
-    font-size: 16px;
-    background-color: var(--chineselearningextension-button-background-color);
-    color: var(--chineselearningextension-button-font-color);
-    border-radius: 12px;
-    padding: 0 8px;
-}
-
 .chineselearningextension-result-message {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 16px;
 }
 
 .target-sentence {
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .pinyin {
     font-size: 14px;
-    opacity: 0.8;
+    opacity: 0.7;
 }
 
 .translation {
-    font-size: 14px;
+    font-size: 16px;
     opacity: 0.9;
 }
 
@@ -154,4 +149,19 @@ h2.tab.active {
 
 .chineselearningextension-external-link {
     color: var(--chineselearningextension-link-color);
+}
+
+.sidepanel-information-message {
+    margin: 16px 0;
+    text-align: center;
+    font-size: 16px;
+}
+
+.example-sentence-list {
+    padding: 0 18px;
+    font-size: 16px;
+}
+
+.example-sentence-item {
+    margin-bottom: 24px;
 }

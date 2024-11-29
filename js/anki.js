@@ -149,8 +149,7 @@ function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
     }
 
     let disabled = false;
-    return html`<h3>Add ${cardType} to Anki?</h3><div><div class="chineselearningextension-result-message"></div>
-            <button @click=${async function (e) {
+    return html`<div class="anki-section"><h3 class="anki-section-header"><button @click=${async function (e) {
             if (disabled) {
                 return;
             }
@@ -177,8 +176,8 @@ function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
                 statusElement.innerText = `Oops, something went wrong.`;
             }
         }} class="chineselearningextension-anki-button">
-                Add card
-            </button>
+                +
+            </button> Add ${cardType} to Anki?<div class="chineselearningextension-result-message"></div></h3>
     </div>`;
 }
 

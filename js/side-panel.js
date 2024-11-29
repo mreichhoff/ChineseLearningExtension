@@ -48,49 +48,7 @@ let currentWord;
 let audioElement;
 let currentAnkiDecks = [];
 
-chrome.storage.session.get('word', async ({ word }) => {
-    currentWord = word;
-    const response = await chrome.runtime.sendMessage({ type: 'definitions', word });
-    if (!response.definitions) {
-        return;
-    }
-    renderHeader(currentWord);
-    currentAnkiDecks = await fetchAnkiDecks();
-    renderDefinitionsSection(currentWord, response.definitions);
-    renderSentencesSection(currentWord);
-    render(renderExternalLinks(currentWord), linksContainer);
-    renderDeckSelector(currentAnkiDecks);
-});
-
-async function renderAudioButton() {
-    if (currentForvoKey) {
-        const audioUrl = await callForvo(currentWord, currentForvoKey);
-        if (!audioUrl) {
-            return;
-        }
-        audioElement = document.createElement('audio');
-        audioElement.crossOrigin = 'anonymous';
-        audioElement.src = audioUrl;
-        audioElement.load();
-        render(html`<button class="chinese-learning-extension-audio-button" @click=${playAudio}>Listen</button>
-            <div>${getAnkiTemplate(currentWord, { audioUrl }, CardType.Audio, getDeckSelectionCallback())}</div>`, audioContainer);
-        return;
-    }
-    // TODO: make clear to users the source of audio (forvo vs web speech api vs other)
-    render(html`<button class="chinese-learning-extension-audio-button" @click=${playAudio}>Listen</button>`, audioContainer);
-}
-
-chrome.storage.session.onChanged.addListener(async (changes) => {
-    if (changes['forvoKey']) {
-        // currently only one or the other can be sent...
-        currentForvoKey = changes['forvoKey'].newValue;
-        return;
-    }
-    currentWord = changes['word'].newValue;
-
-    if (!currentWord) {
-        return;
-    }
+async function updateWithCurrentWord() {
     const response = await chrome.runtime.sendMessage({
         type: 'definitions',
         word: currentWord
@@ -106,7 +64,51 @@ chrome.storage.session.onChanged.addListener(async (changes) => {
     renderSentencesSection(currentWord);
     render(renderExternalLinks(currentWord), linksContainer);
     renderDeckSelector(currentAnkiDecks);
+}
+
+chrome.storage.session.get('word', async ({ word }) => {
+    currentWord = word;
+    updateWithCurrentWord();
 });
+
+chrome.storage.session.onChanged.addListener(async (changes) => {
+    if (changes['forvoKey']) {
+        // currently only one or the other can be sent...
+        currentForvoKey = changes['forvoKey'].newValue;
+        return;
+    }
+    currentWord = changes['word'].newValue;
+
+    if (!currentWord) {
+        return;
+    }
+    updateWithCurrentWord();
+});
+
+async function renderAudioButton() {
+    if (currentForvoKey) {
+        const audioUrl = await callForvo(currentWord, currentForvoKey);
+        if (!audioUrl) {
+            return;
+        }
+        audioElement = document.createElement('audio');
+        audioElement.crossOrigin = 'anonymous';
+        audioElement.src = audioUrl;
+        audioElement.load();
+        render(html`<div class="sidepanel-information-message">Audio from <a href="https://forvo.com">Forvo</a>.</div>
+            <button class="chinese-learning-extension-audio-button" @click=${playAudio}>Listen</button>
+            <div>${getAnkiTemplate(currentWord, { audioUrl }, CardType.Audio, getDeckSelectionCallback())}</div>`, audioContainer);
+        return;
+    }
+    render(html`<div class="sidepanel-information-message">Using computer audio.<br>To get human audio, enter a Forvo API key in
+            <a class="chineselearningextension-external-link" @click=${function () {
+            if (chrome.runtime.openOptionsPage) {
+                chrome.runtime.openOptionsPage();
+            } else {
+                window.open(chrome.runtime.getURL('options.html'));
+            }
+        }}>the options page</a>.</div><button class="chinese-learning-extension-audio-button" @click=${playAudio}>Listen</button>`, audioContainer);
+}
 
 function renderHeader(word) {
     render(html`<h1 class="chineselearningextension-side-panel-header">Learn More - ${word}</h1>`, mainHeaderContainer);

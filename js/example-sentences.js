@@ -20,13 +20,17 @@ async function getSentencesTemplate(word, deckSelectionCallback) {
     if (!sentencesForWord || sentencesForWord.length === 0) {
         return html`Sorry, no sentences found.`
     }
-    return html`${sentencesForWord.map((sentence, index) =>
-        html`<div><div class="example-sentence">
+    return html`<div class="sidepanel-information-message">Example sentences from
+        <a class="chineselearningextension-external-link" href="https://tatoeba.org">Tatoeba</a>
+    </div>
+    <ol class="example-sentence-list">
+    ${sentencesForWord.map((sentence, index) =>
+        html`<li class="example-sentence-item"><div class="example-sentence">
             <p class="target-sentence">${sentence.zh.join('')}</p>
             <p class="pinyin">${sentence.pinyin}</p>
             <p class="translation">${sentence.en}</p>
         </div>
-        ${getAnkiTemplate(word, { sentence }, CardType.Sentence, deckSelectionCallback)}</div>`
+        ${getAnkiTemplate(word, { sentence }, CardType.Sentence, deckSelectionCallback)}</li></ol>`
     )}`;
 }
 
