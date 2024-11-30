@@ -6,27 +6,17 @@
     "background": {
         "service_worker": "background-built.js"
     },
+    "action": {
+        "default_title": "Enable"
+    },
     "permissions": [
         "activeTab",
         "sidePanel",
+        "scripting",
         "storage"
     ],
     "side_panel": {
         "default_path": "side-panel.html"
     },
-    "options_page": "options.html",
-    "content_scripts": [
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "content-built.js"
-            ],
-            "css": [
-                "css.css"
-            ],
-            "all_frames": true
-        }
-    ]
+    "options_page": "options.html"
 }

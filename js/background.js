@@ -29,3 +29,14 @@ chrome.runtime.onMessage.addListener(
         }
     }
 );
+
+chrome.action.onClicked.addListener((tab) => {
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content-built.js']
+    });
+    chrome.scripting.insertCSS({
+        target: { tabId: tab.id },
+        files: ["css.css"]
+    });
+});
