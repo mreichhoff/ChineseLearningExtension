@@ -52,8 +52,18 @@
     padding: 0;
 }
 
+.chinese-learning-extension-audio-button {
+    height: 30px;
+    width: 34px;
+    border-radius: 10px;
+    padding: 6px;
+    cursor: pointer;
+    background-color: var(--chineselearningextension-button-background-color);
+    color: var(--chineselearningextension-button-font-color);
+    font-weight: bold;
+}
+
 .chineselearningextension-anki-button,
-.chinese-learning-extension-audio-button,
 .chineselearningextension-learn-more-button {
     border: none;
     font-size: 16px;
@@ -130,6 +140,7 @@ h2.tab.active {
 
 #deck-selector {
     margin-top: 16px;
+    font-size: 14px;
 }
 
 .chineselearningextension-link-list {
@@ -157,6 +168,14 @@ h2.tab.active {
     font-size: 16px;
 }
 
+.section-container {
+    margin-bottom: 36px;
+}
+
+.section-container.centered {
+    text-align: center;
+}
+
 .example-sentence-list {
     padding: 0 18px;
     font-size: 16px;
@@ -164,4 +183,8 @@ h2.tab.active {
 
 .example-sentence-item {
     margin-bottom: 24px;
+}
+
+.audio-button-container {
+    font-size: 18px;
 }

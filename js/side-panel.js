@@ -107,7 +107,7 @@ async function renderAudioButton() {
             } else {
                 window.open(chrome.runtime.getURL('options.html'));
             }
-        }}>the options page</a>.</div><button class="chinese-learning-extension-audio-button" @click=${playAudio}>Listen</button>`, audioContainer);
+        }}>the options page</a>.</div><div class="audio-button-container"><button class="chinese-learning-extension-audio-button" @click=${playAudio}><span>&gt;</span></button> Play Audio</div>`, audioContainer);
 }
 
 function renderHeader(word) {
