@@ -45,6 +45,7 @@ function switchToTab(desiredTabId) {
 
 let currentForvoKey;
 let currentWord;
+let currentSentence;
 let audioElement;
 let currentAnkiDecks = [];
 
@@ -59,16 +60,19 @@ async function updateWithCurrentWord() {
     audioElement = null;
     renderHeader(currentWord);
     currentAnkiDecks = await fetchAnkiDecks();
-    renderDefinitionsSection(currentWord, response.definitions);
+    renderDefinitionsSection(currentWord, response.definitions, currentSentence);
     renderAudioButton();
     renderSentencesSection(currentWord);
     render(renderExternalLinks(currentWord), linksContainer);
     renderDeckSelector(currentAnkiDecks);
 }
 
-chrome.storage.session.get('word', async ({ word }) => {
-    currentWord = word;
+chrome.storage.session.get().then(items => {
+    currentWord = items.word;
+    currentSentence = items.sentence;
+    currentForvoKey = items.forvoKey;
     updateWithCurrentWord();
+    renderAudioButton();
 });
 
 chrome.storage.session.onChanged.addListener(async (changes) => {
@@ -78,6 +82,10 @@ chrome.storage.session.onChanged.addListener(async (changes) => {
         return;
     }
     currentWord = changes['word'].newValue;
+    // a different word chosen in the same sentence results in no change coming for key `sentence`.
+    if (changes['sentence']) {
+        currentSentence = changes['sentence'].newValue;
+    }
 
     if (!currentWord) {
         return;
@@ -114,10 +122,10 @@ function renderHeader(word) {
     render(html`<h1 class="chineselearningextension-side-panel-header">Learn More - ${word}</h1>`, mainHeaderContainer);
 }
 
-async function renderDefinitionsSection(currentWord, definitions) {
-    const dictionaryTemplate = getDictionaryTemplate(currentWord, definitions);
+async function renderDefinitionsSection(word, definitions, sentence) {
+    const dictionaryTemplate = getDictionaryTemplate(word, definitions, sentence);
     render(html`<div>${dictionaryTemplate}</div>
-        <div>${getAnkiTemplate(currentWord, { definitions }, CardType.Definition, getDeckSelectionCallback())}</div>`, definitionContainer);
+        <div>${getAnkiTemplate(word, { definitions }, CardType.Definition, getDeckSelectionCallback())}</div>`, definitionContainer);
 }
 
 function getDeckSelectionCallback() {
@@ -158,11 +166,6 @@ function playAudio() {
     utterance.text = currentWord;
     speechSynthesis.speak(utterance);
 }
-
-chrome.storage.session.get('forvoKey', async ({ forvoKey }) => {
-    currentForvoKey = forvoKey;
-    renderAudioButton();
-});
 
 async function renderSentencesSection(word) {
     const sentencesTemplate = await getSentencesTemplate(word, getDeckSelectionCallback());

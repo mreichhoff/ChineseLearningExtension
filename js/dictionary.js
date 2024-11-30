@@ -52,7 +52,7 @@ function renderDefinitions(definitions) {
 }
 
 // TODO: make more generic, no popover or side-panel specifics
-function getDictionaryTemplate(word, definitions, callback) {
+function getDictionaryTemplate(word, definitions, sentence, callback) {
     const parsedDefinitions = parseDefinitions(definitions);
     const itemTemplates = [];
     Object.entries(parsedDefinitions).forEach(([pinyin, definitions]) => {
@@ -64,7 +64,7 @@ function getDictionaryTemplate(word, definitions, callback) {
                 ${definitionTemplates}
             </li>`);
     });
-    const button = callback ? html`<button @click=${function () { callback(word) }} class="chineselearningextension-learn-more-button">
+    const button = callback ? html`<button @click=${function () { callback(word, sentence) }} class="chineselearningextension-learn-more-button">
         Learn More
     </button>` : ``;
     const template = html`<div>
@@ -72,6 +72,7 @@ function getDictionaryTemplate(word, definitions, callback) {
                 ${word}
                 ${button}
             </h2>
+            ${callback ? '' : html`<div class="sentence-context">Seen as part of ${sentence}.</div>`}
         </div>
         <ul class="chineselearningextension-definitions">${itemTemplates}</ul>`;
     return template;

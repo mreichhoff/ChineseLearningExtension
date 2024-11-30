@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener(
             }
             sendResponse({ definitions: definitions[request.word] });
         } else if (request.type === 'open-learn-more') {
-            chrome.storage.session.set({ word: request.word });
+            chrome.storage.session.set({ word: request.word, sentence: request.sentence });
             // This will open a tab-specific side panel only on the current tab.
             await chrome.sidePanel.open({ tabId: sender.tab.id });
             await chrome.sidePanel.setOptions({

@@ -188,3 +188,8 @@ h2.tab.active {
 .audio-button-container {
     font-size: 18px;
 }
+
+.sentence-context {
+    font-size: 14px;
+    opacity: 0.7;
+}

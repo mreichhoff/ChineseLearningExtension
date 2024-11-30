@@ -30,8 +30,8 @@ popover.classList.add('chineselearningextension-popover');
 popover.popover = 'auto';
 document.body.appendChild(popover);
 
-function openSidePanel(word) {
-    chrome.runtime.sendMessage({ type: 'open-learn-more', word });
+function openSidePanel(word, sentence) {
+    chrome.runtime.sendMessage({ type: 'open-learn-more', word, sentence });
 }
 
 // oh no, what have i done
@@ -131,6 +131,14 @@ popover.addEventListener('mouseleave', function () {
     triggerHidePopover();
 });
 
+// TODO: sentence segmenter treats these weird in chinese...
+function stripTokenizerArtifacts(sentence) {
+    return sentence.replace(/《$/, '').replace(/^》/, '');
+}
+
+const wordSegmenter = new Intl.Segmenter("zh-CN", { granularity: "word" });
+const sentenceSegmenter = new Intl.Segmenter("zh-CN", { granularity: "sentence" });
+
 function addTones() {
     let modifications = [];
     //need iframe handling
@@ -139,11 +147,20 @@ function addTones() {
     modifications.forEach(mod => {
         mod.parent.removeChild(mod.node);
         const fullText = mod.node.textContent;
-        const segmenter = new Intl.Segmenter("zh-CN", { granularity: "word" });
-        const segments = segmenter.segment(fullText);
+
+        const segments = wordSegmenter.segment(fullText);
+        const sentences = Array.from(sentenceSegmenter.segment(fullText));
         const segmentsAdjustedForDictionary = hackAroundDictionaryTokenizerMismatch(segments);
         // TODO: syntactic sugar
+        let totalLengthTraversed = 0;
+        let sentenceIndex = 0;
         segmentsAdjustedForDictionary.forEach(segment => {
+            if (totalLengthTraversed >= (sentences[sentenceIndex].index + sentences[sentenceIndex].segment.length)) {
+                sentenceIndex++;
+            }
+            const sentence = stripTokenizerArtifacts(sentences[sentenceIndex].segment);
+            //str.replace(/!$/, "");
+            totalLengthTraversed += segment.length;
             let tones = pinyin[segment];
             if (!tones && allHaveTones(segment)) {
                 tones = overrideTones(segment);
@@ -170,7 +187,7 @@ function addTones() {
                     const boundingBox = wrapper.getBoundingClientRect();
                     popover.style.left = `${Math.max(boundingBox.left + window.scrollX - 50, 0)}px`;
                     popover.style.top = `${boundingBox.bottom + window.scrollY}px`;
-                    render(getDictionaryTemplate(segment, response.definitions, openSidePanel), popover);
+                    render(getDictionaryTemplate(segment, response.definitions, sentence, openSidePanel), popover);
                     popover.showPopover();
                 });
                 wrapper.addEventListener('mouseleave', function () {
