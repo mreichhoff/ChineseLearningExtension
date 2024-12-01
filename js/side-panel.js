@@ -4,11 +4,13 @@ import { getAnkiTemplate, CardType, fetchAnkiDecks } from "./anki";
 import { callForvo } from "./forvo-client"
 import { getSentencesTemplate } from './example-sentences';
 import { renderExternalLinks } from './links';
+import { renderAiTab } from './ai';
 
 const definitionContainer = document.getElementById('side-panel-definition-container');
 const audioContainer = document.getElementById('side-panel-audio-container');
 const sentencesContainer = document.getElementById('sentences-container');
 const linksContainer = document.getElementById('links-container');
+const aiContainer = document.getElementById('ai-container');
 const deckSelectorContainer = document.getElementById('deck-selector');
 
 const tabContainer = document.getElementById('tabs');
@@ -18,7 +20,8 @@ const tabToPanel = {
     'tab-definition': ['Definition', definitionContainer, () => !!definitionContainer.querySelector('.chineselearningextension-definition-item')],
     'tab-pronunciation': ['Audio', audioContainer, () => true],
     'tab-sentences': ['Sentences', sentencesContainer, () => !!sentencesContainer.querySelector('.example-sentence')],
-    'tab-links': ['Links', linksContainer, () => false]
+    'tab-links': ['Links', linksContainer, () => false],
+    'tab-ai': ['AI', aiContainer, () => true]
 };
 
 render(html`<h1 class="side-panel-header">Learn More</h1>`, mainHeaderContainer);
@@ -44,6 +47,7 @@ function switchToTab(desiredTabId) {
 }
 
 let currentForvoKey;
+let currentOpenAiKey;
 let currentWord;
 let currentSentence;
 let audioElement;
@@ -64,6 +68,7 @@ async function updateWithCurrentWord() {
     renderAudioButton();
     renderSentencesSection(currentWord);
     render(renderExternalLinks(currentWord), linksContainer);
+    render(renderAiTab(currentWord, currentSentence, currentOpenAiKey), aiContainer);
     renderDeckSelector(currentAnkiDecks);
 }
 
@@ -71,14 +76,18 @@ chrome.storage.session.get().then(items => {
     currentWord = items.word;
     currentSentence = items.sentence;
     currentForvoKey = items.forvoKey;
+    currentOpenAiKey = items.openAiKey;
     updateWithCurrentWord();
-    renderAudioButton();
 });
 
 chrome.storage.session.onChanged.addListener(async (changes) => {
-    if (changes['forvoKey']) {
-        // currently only one or the other can be sent...
-        currentForvoKey = changes['forvoKey'].newValue;
+    if (changes['forvoKey'] || changes['openAiKey']) {
+        if (changes['forvoKey']) {
+            currentForvoKey = changes['forvoKey'].newValue;
+        }
+        if (changes['openAiKey']) {
+            currentOpenAiKey = changes['openAiKey'].newValue;
+        }
         return;
     }
     currentWord = changes['word'].newValue;

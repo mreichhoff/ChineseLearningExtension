@@ -128,7 +128,7 @@ h2.tab {
     display: inline-block;
     opacity: 0.6;
     font-weight: 400;
-    width: 25%;
+    width: 20%;
     text-align: center;
     cursor: pointer;
 }
@@ -160,6 +160,7 @@ h2.tab.active {
 
 .chineselearningextension-external-link {
     color: var(--chineselearningextension-link-color);
+    cursor: pointer;
 }
 
 .sidepanel-information-message {
