@@ -16,6 +16,9 @@ const deckSelectorContainer = document.getElementById('deck-selector');
 const tabContainer = document.getElementById('tabs');
 const mainHeaderContainer = document.getElementById('main-header-container');
 
+const aiQuestionContainer = document.getElementById('ai-question-container');
+const aiResponseContainer = document.getElementById('ai-response-container');
+
 const tabToPanel = {
     'tab-definition': ['Definition', definitionContainer, () => !!definitionContainer.querySelector('.chineselearningextension-definition-item')],
     'tab-pronunciation': ['Audio', audioContainer, () => true],
@@ -68,7 +71,7 @@ async function updateWithCurrentWord() {
     renderAudioButton();
     renderSentencesSection(currentWord);
     render(renderExternalLinks(currentWord), linksContainer);
-    render(renderAiTab(currentWord, currentSentence, currentOpenAiKey), aiContainer);
+    render(renderAiTab(currentWord, currentSentence, currentOpenAiKey, aiResponseContainer), aiQuestionContainer);
     renderDeckSelector(currentAnkiDecks);
 }
 

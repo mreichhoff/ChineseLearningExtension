@@ -3,6 +3,7 @@ import { render, html } from 'lit-html';
 const chatEndpoint = 'https://api.openai.com/v1/chat/completions';
 
 const cachedSentenceResponses = {};
+const cachedWordResponses = {};
 
 async function explainSentence(sentence, key) {
     if (sentence in cachedSentenceResponses) {
@@ -64,6 +65,57 @@ async function explainSentence(sentence, key) {
     return responseJson;
 }
 
+async function explainWord(word, key) {
+    if (word in cachedWordResponses) {
+        return cachedWordResponses[word];
+    }
+    const chatRequest = {
+        "model": "gpt-4o",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a helpful Chinese language teacher. Please output JSON."
+            },
+            {
+                "role": "user",
+                "content": `Please briefly explain the use of "${word}", especially if there's any interesting grammar structures that use it.`
+            }
+        ],
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "word_explanation",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "grammar_points": {
+                            "type": "array", "items": { "type": "string" }
+                        },
+                        "usage": {
+                            "type": "array", "items": { "type": "string" }
+                        }
+                    },
+                    "required": ["grammar_points", "usage"],
+                    "additionalProperties": false
+                },
+                "strict": true
+            }
+        }
+    }
+    const response = await fetch(chatEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`
+        },
+        body: JSON.stringify(chatRequest)
+    });
+    const responseJson = await response.json();
+    // save quota, I guess
+    cachedWordResponses[word] = responseJson;
+    return responseJson;
+}
+
 function getResponseString(aiResponse) {
     if (!aiResponse.choices || aiResponse.choices.length < 1 || !aiResponse.choices[0].message || !aiResponse.choices[0].message.content) {
         return 'ai says no';
@@ -72,7 +124,8 @@ function getResponseString(aiResponse) {
     return JSON.parse(aiResponse.choices[0].message.content);
 }
 
-function renderAiTab(word, sentence, key) {
+function renderAiTab(word, sentence, key, responseContainer) {
+    render(html``, responseContainer);
     if (!key) {
         return html`<div class="sidepanel-information-message">
             To use AI features, please add an API key in <a class="chineselearningextension-external-link" @click=${function () {
@@ -83,21 +136,33 @@ function renderAiTab(word, sentence, key) {
                 }
             }}>the options page</a>.</div>`;
     }
-    return html`<div></div><div><button @click=${async function (event) {
-        const aiResponse = await explainSentence(sentence, key);
-        // lol
-        const messageContainer = event.target.parentNode.previousSibling;
-        const structuredResponse = getResponseString(aiResponse);
-        render(html`<h3>Word-by-word</h3>
+    return html`<div>
+        You selected ${word}, found in the sentence ${sentence}<p><button @click=${async function () {
+            const aiResponse = await explainWord(word, key);
+            const structuredResponse = getResponseString(aiResponse);
+            render(html`<h3>Use of ${word}</h3>
+                <ul>${structuredResponse.usage.map(usage =>
+                html`<li>
+                    ${usage}
+                </li>`)}</ul>
+                <h3>Grammar Points</h3>
+                <ul>${structuredResponse.grammar_points.map(point =>
+                    html`<li>${point}</li>`)}
+                </ul>`, responseContainer);
+        }}>AI Word Analysis</button></p>
+    </div><div></div><div><button @click=${async function () {
+            const aiResponse = await explainSentence(sentence, key);
+            const structuredResponse = getResponseString(aiResponse);
+            render(html`<h3>Word-by-word</h3>
             <ul>${structuredResponse.word_by_word.map(wordExplanation =>
-            html`<li>
+                html`<li>
                 <span>${wordExplanation.word}: </span><span>${wordExplanation.meaning}</span>
             </li>`)}</ul>
             <h3>Grammar Points</h3>
             <ul>${structuredResponse.grammar_points.map(point =>
-                html`<li>${point}</li>`)}
-            </ul>`, messageContainer);
-    }}>Ask an AI</button></div>`;
+                    html`<li>${point}</li>`)}
+            </ul>`, responseContainer);
+        }}>AI Sentence Analysis</button></div>`;
 }
 
 export { renderAiTab }
