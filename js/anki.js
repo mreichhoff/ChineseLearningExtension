@@ -149,7 +149,7 @@ function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
     }
 
     let disabled = false;
-    return html`<div class="anki-section"><h3 class="anki-section-header"><button @click=${async function (e) {
+    return html`<div class="anki-section"><p class="anki-section-header"><button @click=${async function (e) {
             if (disabled) {
                 return;
             }
@@ -175,9 +175,9 @@ function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
                 disabled = false;
                 statusElement.innerText = `Oops, something went wrong.`;
             }
-        }} class="chineselearningextension-anki-button">
+        }} class="chineselearningextension-button">
                 +
-            </button> Add ${cardType} to Anki?<div class="chineselearningextension-result-message"></div></h3>
+            </button> Add ${cardType} to Anki?<div class="chineselearningextension-result-message"></div></p>
     </div>`;
 }
 

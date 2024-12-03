@@ -64,7 +64,7 @@ function getDictionaryTemplate(word, definitions, sentence, callback) {
                 ${definitionTemplates}
             </li>`);
     });
-    const button = callback ? html`<button @click=${function () { callback(word, sentence) }} class="chineselearningextension-learn-more-button">
+    const button = callback ? html`<button @click=${function () { callback(word, sentence) }} class="chineselearningextension-button float-right">
         Learn More
     </button>` : ``;
     const template = html`<div>

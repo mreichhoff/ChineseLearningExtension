@@ -4,6 +4,7 @@ const chatEndpoint = 'https://api.openai.com/v1/chat/completions';
 
 const cachedSentenceResponses = {};
 const cachedWordResponses = {};
+const spinner = document.getElementById('ai-loading-spinner');
 
 async function explainSentence(sentence, key) {
     if (sentence in cachedSentenceResponses) {
@@ -137,32 +138,41 @@ function renderAiTab(word, sentence, key, responseContainer) {
             }}>the options page</a>.</div>`;
     }
     return html`<div>
-        You selected ${word}, found in the sentence ${sentence}<p><button @click=${async function () {
+        <p class="sidepanel-information-message">You selected 
+            <span class="chineselearningextension-emphasized">${word}</span>, found in the sentence 
+            <span class="chineselearningextension-emphasized">${sentence}</span>
+        </p>
+        <p>
+        <button class="chineselearningextension-button" @click=${async function () {
+            spinner.removeAttribute('style');
             const aiResponse = await explainWord(word, key);
             const structuredResponse = getResponseString(aiResponse);
             render(html`<h3>Use of ${word}</h3>
-                <ul>${structuredResponse.usage.map(usage =>
+                <ul class="explanation-list">${structuredResponse.usage.map(usage =>
                 html`<li>
                     ${usage}
                 </li>`)}</ul>
                 <h3>Grammar Points</h3>
-                <ul>${structuredResponse.grammar_points.map(point =>
+                <ul class="explanation-list">${structuredResponse.grammar_points.map(point =>
                     html`<li>${point}</li>`)}
                 </ul>`, responseContainer);
-        }}>AI Word Analysis</button></p>
-    </div><div></div><div><button @click=${async function () {
+            spinner.style.display = 'none';
+        }}>AI Word Analysis</button>
+        <button class="chineselearningextension-button float-right" @click=${async function (e) {
+            spinner.removeAttribute('style');
             const aiResponse = await explainSentence(sentence, key);
             const structuredResponse = getResponseString(aiResponse);
             render(html`<h3>Word-by-word</h3>
-            <ul>${structuredResponse.word_by_word.map(wordExplanation =>
+            <ul class="explanation-list">${structuredResponse.word_by_word.map(wordExplanation =>
                 html`<li>
-                <span>${wordExplanation.word}: </span><span>${wordExplanation.meaning}</span>
+                <span class="target-sentence">${wordExplanation.word}: </span><span>${wordExplanation.meaning}</span>
             </li>`)}</ul>
             <h3>Grammar Points</h3>
-            <ul>${structuredResponse.grammar_points.map(point =>
+            <ul class="explanation-list">${structuredResponse.grammar_points.map(point =>
                     html`<li>${point}</li>`)}
             </ul>`, responseContainer);
-        }}>AI Sentence Analysis</button></div>`;
+            spinner.style.display = 'none';
+        }}>AI Sentence Analysis</button></p></div>`;
 }
 
 export { renderAiTab }

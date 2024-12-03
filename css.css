@@ -63,8 +63,7 @@
     font-weight: bold;
 }
 
-.chineselearningextension-anki-button,
-.chineselearningextension-learn-more-button {
+.chineselearningextension-button {
     border: none;
     font-size: 16px;
     background-color: var(--chineselearningextension-button-background-color);
@@ -76,9 +75,11 @@
 
 .anki-section-header {
     font-size: 14px;
+    font-weight: bold;
 }
 
-.chineselearningextension-learn-more-button {
+/* TODO stop this */
+.float-right {
     float: right;
 }
 
@@ -97,6 +98,7 @@
 
 .target-sentence {
     font-size: 20px;
+    opacity: 1;
 }
 
 .pinyin {
@@ -136,6 +138,12 @@ h2.tab {
 h2.tab.active {
     opacity: 1;
     font-weight: bold;
+}
+
+.chineselearningextension-side-panel h3 {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
 }
 
 #deck-selector {
@@ -193,4 +201,48 @@ h2.tab.active {
 .sentence-context {
     font-size: 14px;
     opacity: 0.7;
+}
+
+.explanation-list {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* https://loading.io/css/ */
+.lds-dual-ring {
+    color: var(--chineselearningextension-link-color);
+    /* TODO: huh? */
+    margin: 0 50%;
+}
+
+.lds-dual-ring,
+.lds-dual-ring:after {
+    box-sizing: border-box;
+}
+
+.lds-dual-ring {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+}
+
+.lds-dual-ring:after {
+    content: " ";
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 6px solid currentColor;
+    border-color: currentColor transparent currentColor transparent;
+    animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
