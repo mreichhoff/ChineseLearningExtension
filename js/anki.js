@@ -154,10 +154,10 @@ function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
                 return;
             }
             disabled = true;
-            const parent = e.target.parentNode;
             // TODO: we code good
+            const ankiSection = e.target.parentNode.parentNode;
             const deck = deckSelectionCallback();
-            const statusElement = parent.querySelector('.chineselearningextension-result-message');
+            const statusElement = ankiSection.querySelector('.chineselearningextension-result-message');
             try {
                 if (cardType === CardType.Audio) {
                     await makeAudioCard(word, cardRequest.audioUrl, deck);
