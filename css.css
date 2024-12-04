@@ -5,6 +5,8 @@
     --chineselearningextension-button-font-color: #eee;
     --chineselearningextension-border-color: #3333;
     --chineselearningextension-link-color: #0083ff;
+    --chineselearningextension-input-background-color: #fff;
+    --chineselearningextension-input-border: 1px solid #333;
 
 }
 
@@ -16,6 +18,7 @@
         --chineselearningextension-button-font-color: #121212;
         --chineselearningextension-border-color: #9999;
         --chineselearningextension-link-color: #0ff;
+        --chineselearningextension-input-background-color: #2e2e2e;
     }
 }
 
@@ -86,6 +89,17 @@
 .chineselearningextension-side-panel {
     background-color: var(--chineselearningextension-background-color);
     color: var(--chineselearningextension-font-color);
+}
+
+.options-page {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 14px;
+}
+
+.options-page input[type=text] {
+    background-color: var(--chineselearningextension-input-background-color);
+    border: var(--chineselearningextension-input-border);
 }
 
 .chineselearningextension-side-panel-header {

@@ -6,23 +6,50 @@
     <link rel="stylesheet" href="css.css">
 </head>
 
-<body class="chineselearningextension-side-panel">
+<body class="chineselearningextension-side-panel options-page">
     <h1>Chinese Learning Extension Options</h1>
     <p class="chineselearningextension-result-message" id="result-message"></p>
     <form id="integration-options">
-        <p>
-            <label>
-                Forvo API Key:
-                <input type="text" name="forvo-api-key" id="forvo-api-key" />
-            </label>
-        </p>
-        <p>
-            <label>
-                OpenAI API Key:
-                <input type="text" name="openai-api-key" , id="openai-api-key" />
-            </label>
-        </p>
-        <input type="submit" />
+        <h2>Forvo</h2>
+        <div>
+            <p>
+                Integration with Forvo allows you to get recordings, and create flash cards, of someone pronouncing a
+                word.<br>
+                The audio is human-generated, not AI.<br>To set up the integration, enter your Forvo
+                API key
+                below.<br>
+                To obtain a Forvo API key, visit <a class="chineselearningextension-external-link"
+                    href="https://api.forvo.com/">the Forvo API website</a>, and choose
+                any plan.
+            </p>
+            <p>
+                <label>
+                    Forvo API Key:
+                    <input type="text" name="forvo-api-key" id="forvo-api-key" placeholder="Forvo API Key" />
+                </label>
+            </p>
+        </div>
+        <div>
+            <h2>OpenAI</h2>
+            <p>
+                Integration with OpenAI allows you to get AI analysis of words and sentences
+                you encounter while browsing the web.<br>
+                To set up the integration, enter your OpenAI API key
+                below.<br>
+                To obtain an OpenAI API key, visit <a class="chineselearningextension-external-link"
+                    href="https://platform.openai.com/docs/quickstart">the OpenAI API
+                    website</a>, and follow their setup instructions.
+            </p>
+            <p>
+                <label>
+                    OpenAI API Key:
+                    <input type="text" name="openai-api-key" id="openai-api-key" placeholder="OpenAI API Key" />
+                </label>
+            </p>
+        </div>
+        <div>
+            <input class="chineselearningextension-button" type="submit" />
+        </div>
     </form>
     <script src="options-built.js"></script>
 </body>
