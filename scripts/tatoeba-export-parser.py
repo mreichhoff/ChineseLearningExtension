@@ -77,17 +77,25 @@ def main():
     get_translations(args.translation_filename, sentences)
     tokenize(sentences)
     get_average_frequency(sentences, freq_dict)
-    result = list(sentences.values())
+    result = [sentence for sentence in sentences.values() if 'en' in sentence]
     result.sort(key=lambda entry: entry['freq'])
     # shrinking ever so slightly, but not needed on the frontend
     remove_freq_field(result)
     result_by_word = {}
     for sentence in result:
-        for word in sentence['zh']:
+        for word in set(sentence['zh']):
             if word not in result_by_word:
                 result_by_word[word] = []
             if len(result_by_word[word]) < 3:
                 result_by_word[word].append(sentence)
+    # for those characters without enough sentences, allow them even if used as part of another word
+    # but only as a backup for when we don't have enough sentences otherwise
+    for sentence in result:
+        for character in set(''.join(sentence['zh'])):
+            if character not in result_by_word:
+                result_by_word[character] = []
+            if len(result_by_word[character]) < 3:
+                result_by_word[character].append(sentence)
     print(json.dumps(result_by_word, ensure_ascii=False))
 
 
