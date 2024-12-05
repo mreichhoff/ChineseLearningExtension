@@ -1,6 +1,6 @@
 import { html, render } from 'lit-html';
 import { getDictionaryTemplate } from './dictionary';
-import { getAnkiTemplate, CardType, fetchAnkiDecks } from "./anki";
+import { getAnkiTemplate, CardType, fetchAnkiDecks, fetchExistingCards } from "./anki";
 import { callForvo } from "./forvo-client"
 import { getSentencesTemplate } from './example-sentences';
 import { renderExternalLinks } from './links';
@@ -67,6 +67,7 @@ async function updateWithCurrentWord() {
     audioElement = null;
     renderHeader(currentWord);
     currentAnkiDecks = await fetchAnkiDecks();
+    await fetchExistingCards();
     renderDefinitionsSection(currentWord, response.definitions, currentSentence);
     renderAudioButton();
     renderSentencesSection(currentWord);
@@ -106,6 +107,8 @@ chrome.storage.session.onChanged.addListener(async (changes) => {
 });
 
 async function renderAudioButton() {
+    // TODO: this clearing of state and re-rendering should just be replaced by actual components. It's time.
+    render(html``, audioContainer);
     if (currentForvoKey) {
         const audioUrl = await callForvo(currentWord, currentForvoKey);
         if (!audioUrl) {
@@ -135,6 +138,7 @@ function renderHeader(word) {
 }
 
 async function renderDefinitionsSection(word, definitions, sentence) {
+    render(html``, definitionContainer);
     const dictionaryTemplate = getDictionaryTemplate(word, definitions, sentence);
     render(html`<div>${dictionaryTemplate}</div>
         <div>${getAnkiTemplate(word, { definitions }, CardType.Definition, getDeckSelectionCallback())}</div>`, definitionContainer);
@@ -180,6 +184,7 @@ function playAudio() {
 }
 
 async function renderSentencesSection(word) {
+    render(html``, sentencesContainer);
     const sentencesTemplate = await getSentencesTemplate(word, getDeckSelectionCallback());
     render(sentencesTemplate, sentencesContainer);
 }

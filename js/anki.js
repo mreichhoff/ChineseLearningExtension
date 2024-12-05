@@ -1,7 +1,9 @@
-import { html } from "lit-html"
+import { html, render } from "lit-html"
 import { parseDefinitions } from "./dictionary"
 
 const ankiConnectBaseUrl = 'http://localhost:8765';
+
+let existingAnkiCards = [];
 
 async function fetchAnkiDecks() {
     try {
@@ -15,6 +17,38 @@ async function fetchAnkiDecks() {
         const responseJson = await ankiConnectResponse.json();
         // TODO: what does the deck ID do? name appears used at least in addNote
         return Array.from(Object.entries(responseJson.result))
+    } catch (x) {
+        // no anki-connect? no ability to add flash cards, but that's ok
+        console.log('error calling anki', x)
+        return [];
+    }
+}
+
+async function fetchExistingCards() {
+    try {
+        // TODO: combine with callAnkiConnect
+        const findNotesResponse = await fetch(ankiConnectBaseUrl, {
+            body: JSON.stringify({
+                "action": "findNotes",
+                "version": 6,
+                "params": {
+                    "query": "tag:ChineseLearningExtension"
+                }
+            }), method: 'POST'
+        });
+        const responseJson = await findNotesResponse.json();
+        const existingCardsFromExtension = responseJson.result;
+        const noteInfoResponse = await fetch(ankiConnectBaseUrl, {
+            body: JSON.stringify({
+                "action": "notesInfo",
+                "version": 6,
+                "params": {
+                    "notes": existingCardsFromExtension
+                }
+            }), method: 'POST'
+        });
+        const noteInfoResponseJson = await noteInfoResponse.json();
+        existingAnkiCards = Object.fromEntries(noteInfoResponseJson.result.map(card => [card.fields.Front.value || card.fields.audio[0].filename, card.fields.Back.value]));
     } catch (x) {
         // no anki-connect? no ability to add flash cards, but that's ok
         console.log('error calling anki', x)
@@ -87,7 +121,6 @@ async function makeAudioCard(word, audioUrl, deck) {
                 "audio": [{
                     "url": audioUrl,
                     "filename": `ChineseLearningExtension-${word}.mp3`,
-                    "skipHash": "7e2c2f954ef6051373ba916f000168dc",
                     "fields": [
                         "Front"
                     ]
@@ -143,42 +176,48 @@ const CardType = {
     Sentence: 'sentence'
 };
 
+function hasExistingCard(word, cardRequest, cardType) {
+    if (cardType === CardType.Audio) {
+        // uh...
+        return !!existingAnkiCards[`ChineseLearningExtension-${word}.mp3`];
+    }
+    if (cardType === CardType.Definition) {
+        return !!existingAnkiCards[word];
+    }
+    if (cardType === CardType.Sentence) {
+        return !!existingAnkiCards[cardRequest.sentence.zh.join('')]
+    }
+}
+
 function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
     if (!deckSelectionCallback) {
         return '';
     }
-
     let disabled = false;
-    return html`<div class="anki-section"><p class="anki-section-header"><button @click=${async function (e) {
-            if (disabled) {
-                return;
+    return html`<div class="anki-section"><p class="anki-section-header">${hasExistingCard(word, cardRequest, cardType) ? html`Added to Anki` : html`<button @click=${async function (e) {
+        if (disabled) {
+            return;
+        }
+        disabled = true;
+        // TODO: we code good
+        const ankiParagraph = e.target.parentNode;
+        const deck = deckSelectionCallback();
+        try {
+            if (cardType === CardType.Audio) {
+                await makeAudioCard(word, cardRequest.audioUrl, deck);
+            } else if (cardType === CardType.Definition) {
+                await makeDefinitionCard(word, cardRequest.definitions, deck);
+            } else if (cardType === CardType.Sentence) {
+                await makeSentenceCard(word, cardRequest.sentence, deck);
             }
-            disabled = true;
-            // TODO: we code good
-            const ankiSection = e.target.parentNode.parentNode;
-            const deck = deckSelectionCallback();
-            const statusElement = ankiSection.querySelector('.chineselearningextension-result-message');
-            try {
-                if (cardType === CardType.Audio) {
-                    await makeAudioCard(word, cardRequest.audioUrl, deck);
-                } else if (cardType === CardType.Definition) {
-                    await makeDefinitionCard(word, cardRequest.definitions, deck);
-                } else if (cardType === CardType.Sentence) {
-                    await makeSentenceCard(word, cardRequest.sentence, deck);
-                }
-                statusElement.innerText = `Successfully added ${word} ${cardType} to ${deck}.`;
-                setTimeout(function () {
-                    statusElement.innerText = '';
-                    disabled = false
-                }, 3000);
-            } catch (e) {
-                disabled = false;
-                statusElement.innerText = `Oops, something went wrong.`;
-            }
-        }} class="chineselearningextension-button">
+            ankiParagraph.innerText = 'Added to Anki';
+        } catch (e) {
+            disabled = false;
+        }
+    }} class="chineselearningextension-button">
                 +
-            </button> Add ${cardType} to Anki?<div class="chineselearningextension-result-message"></div></p>
+            </button> Add ${cardType} to Anki?`}</p>
     </div>`;
 }
 
-export { getAnkiTemplate, fetchAnkiDecks, CardType }
+export { getAnkiTemplate, fetchAnkiDecks, fetchExistingCards, CardType }
