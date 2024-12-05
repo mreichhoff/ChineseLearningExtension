@@ -72,7 +72,7 @@ function getDictionaryTemplate(word, definitions, sentence, callback) {
                 ${word}
                 ${button}
             </h2>
-            ${callback ? '' : html`<div class="sentence-context">Seen as part of ${sentence}.</div>`}
+            ${callback ? '' : html`<div class="sentence-context">Seen as part of "${sentence}"</div>`}
         </div>
         <ul class="chineselearningextension-definitions">${itemTemplates}</ul>`;
     return template;
