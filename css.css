@@ -100,6 +100,8 @@
 .options-page input[type=text] {
     background-color: var(--chineselearningextension-input-background-color);
     border: var(--chineselearningextension-input-border);
+    color: var(--chineselearningextension-font-color);
+    font-size: 16px;
 }
 
 .chineselearningextension-side-panel-header {

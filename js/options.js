@@ -12,3 +12,10 @@ integrationsForm.addEventListener('submit', function (e) {
         }, 3000);
     });
 });
+
+chrome.storage.session.get().then(items => {
+    if (!items.openAiKey) {
+        return;
+    }
+    openAiField.value = items.openAiKey;
+});
