@@ -67,6 +67,18 @@
 }
 
 .chineselearningextension-button {
+    font-size: 14px;
+    font-weight: bold;
+    background-color: var(--chineselearningextension-background-color);
+    color: var(--chineselearningextension-font-color);
+    border: 2px solid var(--chineselearningextension-font-color);
+    border-radius: 12px;
+    padding: 4px 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.chineselearningextension-add-card-button {
     border: none;
     font-size: 16px;
     background-color: var(--chineselearningextension-button-background-color);
@@ -74,6 +86,7 @@
     border-radius: 8px;
     padding: 2px 8px;
     cursor: pointer;
+    user-select: none;
 }
 
 .anki-section-header {

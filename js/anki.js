@@ -214,7 +214,7 @@ function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
         } catch (e) {
             disabled = false;
         }
-    }} class="chineselearningextension-button">
+    }} class="chineselearningextension-add-card-button">
                 +
             </button> Add ${cardType} to Anki?`}</p>
     </div>`;
