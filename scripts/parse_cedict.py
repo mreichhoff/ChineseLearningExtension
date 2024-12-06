@@ -81,9 +81,9 @@ def main():
         graph = json.load(f)
 
     # sigh....
-    dont_reorder_list = {'了', '更'}
+    force_specific_order_by_tone = {'了': 'le5', '更': 'geng4', '吗': 'ma5', '曲': 'qu3'}
     for word, definitions in result.items():
-        if len(word) > 1 or (word not in graph) or (word not in result) or (word in dont_reorder_list):
+        if len(word) > 1 or (word not in graph) or (word not in result):
             continue
         pinyin_options = {item['pinyin'] for item in result[word]}
         if len(pinyin_options) < 2:
@@ -95,6 +95,8 @@ def main():
         all_pinyin = {key: [item['pinyin'] for item in value]
                       for key, value in all_definitions.items()}
         pinyin_counts = {pinyin: 0 for pinyin in pinyin_options}
+        if word in force_specific_order_by_tone:
+            pinyin_counts[force_specific_order_by_tone[word]] = 1000
         # oh no, what have i done
         for key, value in all_pinyin.items():
             index = 0
