@@ -21,7 +21,7 @@ const aiResponseContainer = document.getElementById('ai-response-container');
 
 const tabToPanel = {
     'tab-definition': ['Definition', definitionContainer, () => !!definitionContainer.querySelector('.chineselearningextension-definition-item')],
-    'tab-pronunciation': ['Audio', audioContainer, () => true],
+    // 'tab-pronunciation': ['Audio', audioContainer, () => true],
     'tab-sentences': ['Sentences', sentencesContainer, () => !!sentencesContainer.querySelector('.example-sentence')],
     'tab-links': ['Links', linksContainer, () => false],
     'tab-ai': ['AI', aiContainer, () => true]
