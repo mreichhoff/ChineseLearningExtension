@@ -19,7 +19,7 @@ async function explainSentence(sentence, key) {
             },
             {
                 "role": "user",
-                "content": `Please briefly explain the grammar of the sentence "${sentence}"`
+                "content": `Please briefly explain, in English, the grammar of the sentence "${sentence}"`
             }
         ],
         "response_format": {
@@ -79,7 +79,7 @@ async function explainWord(word, key) {
             },
             {
                 "role": "user",
-                "content": `Please briefly explain the use of "${word}", especially if there's any interesting grammar structures that use it.`
+                "content": `Please briefly explain, in English, the use of "${word}", especially if there's any interesting grammar structures that use it.`
             }
         ],
         "response_format": {
@@ -165,7 +165,7 @@ function renderAiTab(word, sentence, key, responseContainer) {
             render(html`<h3>Word-by-word</h3>
             <ul class="explanation-list">${structuredResponse.word_by_word.map(wordExplanation =>
                 html`<li>
-                <span class="target-sentence">${wordExplanation.word}: </span><span>${wordExplanation.meaning}</span>
+                <span class="target-sentence">${wordExplanation.word}: </span><span class="translation">${wordExplanation.meaning}</span>
             </li>`)}</ul>
             <h3>Grammar Points</h3>
             <ul class="explanation-list">${structuredResponse.grammar_points.map(point =>
