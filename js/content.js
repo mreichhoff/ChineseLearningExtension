@@ -180,7 +180,8 @@ function addTones() {
                 }
                 wrapper.addEventListener('mouseenter', async function () {
                     const response = await chrome.runtime.sendMessage({ type: 'definitions', word: segment });
-                    if (!response.definitions) {
+                    // unclear in what cases response is null or undefined, but it does happen. Being defensive.
+                    if (!response || !response.definitions) {
                         return;
                     }
                     cancelHidePopover();
