@@ -1,9 +1,11 @@
 import { render, html } from 'lit-html';
 
 const chatEndpoint = 'https://api.openai.com/v1/chat/completions';
+const ttsEndpoint = 'https://api.openai.com/v1/audio/speech';
 
 const cachedSentenceResponses = {};
 const cachedWordResponses = {};
+const cachedAudioResponses = {};
 const spinner = document.getElementById('ai-loading-spinner');
 
 async function explainSentence(sentence, key) {
@@ -117,6 +119,28 @@ async function explainWord(word, key) {
     return responseJson;
 }
 
+async function getAudio(text, key) {
+    if (text in cachedAudioResponses) {
+        return cachedAudioResponses[text];
+    }
+    const request = {
+        model: "tts-1",
+        input: `${text}`,
+        voice: "nova"
+    };
+    const response = await fetch(ttsEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`
+        },
+        body: JSON.stringify(request)
+    });
+    const data = await response.arrayBuffer();
+    cachedAudioResponses[text] = data;
+    return data;
+}
+
 function getResponseString(aiResponse) {
     if (!aiResponse.choices || aiResponse.choices.length < 1 || !aiResponse.choices[0].message || !aiResponse.choices[0].message.content) {
         return 'ai says no';
@@ -125,6 +149,7 @@ function getResponseString(aiResponse) {
 }
 
 function renderAiTab(word, sentence, key, responseContainer) {
+    let audioCtx = new AudioContext();
     render(html``, responseContainer);
     if (!key) {
         return html`<div class="sidepanel-information-message">
@@ -141,7 +166,7 @@ function renderAiTab(word, sentence, key, responseContainer) {
             <span class="chineselearningextension-emphasized">${word}</span>, found in the sentence 
             <span class="chineselearningextension-emphasized">${sentence}</span>
         </p>
-        <p>
+        <p class="button-container">
         <button class="chineselearningextension-button" @click=${async function () {
             spinner.removeAttribute('style');
             const aiResponse = await explainWord(word, key);
@@ -156,8 +181,8 @@ function renderAiTab(word, sentence, key, responseContainer) {
                     html`<li>${point}</li>`)}
                 </ul>`, responseContainer);
             spinner.style.display = 'none';
-        }}>AI Word Analysis</button>
-        <button class="chineselearningextension-button float-right" @click=${async function (e) {
+        }}>Analyze Word</button>
+        <button class="chineselearningextension-button" @click=${async function (e) {
             spinner.removeAttribute('style');
             const aiResponse = await explainSentence(sentence, key);
             const structuredResponse = getResponseString(aiResponse);
@@ -171,7 +196,21 @@ function renderAiTab(word, sentence, key, responseContainer) {
                     html`<li>${point}</li>`)}
             </ul>`, responseContainer);
             spinner.style.display = 'none';
-        }}>AI Sentence Analysis</button></p></div>`;
+        }}>Analyze Sentence</button>
+        <button class="chineselearningextension-button" @click=${async function (e) {
+            spinner.removeAttribute('style');
+            const aiResponse = await getAudio(sentence, key);
+            // slice(0) copies the array buffer before passing it off to the audio context
+            // this allows caching without requiring a serviceworker caching setup, which feels heavy?
+            // copying this can be a bit slow, but in almost all cases these are small audio files of a few seconds
+            let buffer = await audioCtx.decodeAudioData(aiResponse.slice(0));
+            let source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start();
+            spinner.style.display = 'none';
+        }}>Pronounce Sentence</button>
+        </p></div>`;
 }
 
 export { renderAiTab }
