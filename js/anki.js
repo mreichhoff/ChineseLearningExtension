@@ -48,9 +48,11 @@ async function fetchExistingCards() {
         });
         const noteInfoResponseJson = await noteInfoResponse.json();
         existingAnkiCards = Object.fromEntries(noteInfoResponseJson.result.map(card => [card.fields.Front.value, card.fields.Back.value]));
+        // TODO hydrate and also return....probably not great
+        return existingAnkiCards;
     } catch (x) {
         // no anki-connect? no ability to add flash cards, but that's ok
-        return [];
+        return {};
     }
 }
 
