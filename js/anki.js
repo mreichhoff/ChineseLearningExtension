@@ -47,7 +47,7 @@ async function fetchExistingCards() {
             }), method: 'POST'
         });
         const noteInfoResponseJson = await noteInfoResponse.json();
-        existingAnkiCards = Object.fromEntries(noteInfoResponseJson.result.map(card => [card.fields.Front.value || card.fields.audio[0].filename, card.fields.Back.value]));
+        existingAnkiCards = Object.fromEntries(noteInfoResponseJson.result.map(card => [card.fields.Front.value, card.fields.Back.value]));
     } catch (x) {
         // no anki-connect? no ability to add flash cards, but that's ok
         return [];
@@ -92,7 +92,34 @@ async function makeDefinitionCard(word, definitions, deck) {
     callAnkiConnect(requestBody);
 }
 
-async function makeAudioCard(word, audioUrl, deck) {
+// google AI spit this out, it has to be right
+function hashText(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
+
+async function makeAudioCard(text, cardRequest, deck) {
+    const textHash = hashText(text);
+    const audioArray = [
+        (cardRequest.audioUrl ? {
+            "url": audioUrl,
+            "filename": `ChineseLearningExtension-${textHash}.mp3`,
+            "fields": [
+                "Front"
+            ]
+        } : {
+            "data": cardRequest.audioData,
+            "filename": `ChineseLearningExtension-${textHash}.mp3`,
+            "fields": [
+                "Front"
+            ]
+        })
+    ];
     const requestBody = {
         "action": "addNote",
         "version": 6,
@@ -102,7 +129,7 @@ async function makeAudioCard(word, audioUrl, deck) {
                 "modelName": "Basic",
                 "fields": {
                     "Front": "",
-                    "Back": word
+                    "Back": text
                 },
                 "options": {
                     "allowDuplicate": false,
@@ -116,13 +143,7 @@ async function makeAudioCard(word, audioUrl, deck) {
                 "tags": [
                     "ChineseLearningExtension"
                 ],
-                "audio": [{
-                    "url": audioUrl,
-                    "filename": `ChineseLearningExtension-${word}.mp3`,
-                    "fields": [
-                        "Front"
-                    ]
-                }]
+                "audio": audioArray
             }
         }
     };
@@ -176,8 +197,9 @@ const CardType = {
 
 function hasExistingCard(word, cardRequest, cardType) {
     if (cardType === CardType.Audio) {
+        const hashedAudioText = hashText(word);
         // uh...
-        return !!existingAnkiCards[`ChineseLearningExtension-${word}.mp3`];
+        return !!existingAnkiCards[`[sound:ChineseLearningExtension-${hashedAudioText}.mp3]`];
     }
     if (cardType === CardType.Definition) {
         return !!existingAnkiCards[word];
@@ -202,7 +224,7 @@ function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
         const deck = deckSelectionCallback();
         try {
             if (cardType === CardType.Audio) {
-                await makeAudioCard(word, cardRequest.audioUrl, deck);
+                await makeAudioCard(word, cardRequest, deck);
             } else if (cardType === CardType.Definition) {
                 await makeDefinitionCard(word, cardRequest.definitions, deck);
             } else if (cardType === CardType.Sentence) {

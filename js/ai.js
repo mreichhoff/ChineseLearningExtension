@@ -1,4 +1,5 @@
 import { render, html } from 'lit-html';
+import { getAnkiTemplate, CardType } from './anki';
 
 const chatEndpoint = 'https://api.openai.com/v1/chat/completions';
 const ttsEndpoint = 'https://api.openai.com/v1/audio/speech';
@@ -148,7 +149,17 @@ function getResponseString(aiResponse) {
     return JSON.parse(aiResponse.choices[0].message.content);
 }
 
-function renderAiTab(word, sentence, key, responseContainer) {
+function getAudioAsDataUrl(audioArrayBuffer) {
+    let binary = '';
+    let bytes = new Uint8Array(audioArrayBuffer);
+    let len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+}
+
+function renderAiTab(word, sentence, key, deckSelectionCallback, responseContainer) {
     let audioCtx = new AudioContext();
     render(html``, responseContainer);
     if (!key) {
@@ -209,6 +220,7 @@ function renderAiTab(word, sentence, key, responseContainer) {
             source.connect(audioCtx.destination);
             source.start();
             spinner.style.display = 'none';
+            render(html`<div>${getAnkiTemplate(sentence, { audioData: getAudioAsDataUrl(aiResponse) }, CardType.Audio, deckSelectionCallback)}</div>`, responseContainer);
         }}>Pronounce Sentence</button>
         </p></div>`;
 }

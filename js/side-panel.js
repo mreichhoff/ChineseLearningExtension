@@ -72,7 +72,7 @@ async function updateWithCurrentWord() {
     renderAudioButton();
     renderSentencesSection(currentWord);
     render(renderExternalLinks(currentWord), linksContainer);
-    render(renderAiTab(currentWord, currentSentence, currentOpenAiKey, aiResponseContainer), aiQuestionContainer);
+    render(renderAiTab(currentWord, currentSentence, currentOpenAiKey, getDeckSelectionCallback(), aiResponseContainer), aiQuestionContainer);
     renderDeckSelector(currentAnkiDecks);
 }
 
