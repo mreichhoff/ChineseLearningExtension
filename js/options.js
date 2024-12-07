@@ -29,8 +29,8 @@ async function renderAnkiConnectStatus() {
     const decks = await fetchAnkiDecks();
     if (decks.length != 0) {
         const existingCards = await fetchExistingCards();
-        ankiConnectField.innerText = `Successfully connected to AnkiConnect. Found ${decks.length} existing decks,
-        and ${Object.entries(existingCards).length} cards created by ChineseLearningExtension.`;
+        ankiConnectField.innerText = `Successfully connected to AnkiConnect.
+        Found ${decks.length} existing decks, and ${Object.entries(existingCards).length} cards created by ChineseLearningExtension.`;
     } else {
         ankiConnectField.innerText = `Either could not reach AnkiConnect, or no decks found. See above for instructions.`;
     }
