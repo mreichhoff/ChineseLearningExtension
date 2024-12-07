@@ -2,12 +2,24 @@
     "name": "Chinese Learning Extension",
     "version": "0.1",
     "manifest_version": 3,
-    "description": "TODO",
+    "icons": {
+        "16": "images/icon16.png",
+        "32": "images/icon32.png",
+        "48": "images/icon48.png",
+        "128": "images/icon128.png"
+    },
+    "description": "An extension to help Chinese language learners remember tones, memorize words, and understand grammar.",
     "background": {
         "service_worker": "background-built.js"
     },
     "action": {
-        "default_title": "Enable"
+        "default_title": "Enable tone colors and dictionary",
+        "default_icon": {
+            "16": "images/icon16.png",
+            "32": "images/icon32.png",
+            "48": "images/icon48.png",
+            "128": "images/icon128.png"
+        }
     },
     "permissions": [
         "activeTab",
