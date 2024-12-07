@@ -61,7 +61,7 @@ async function updateWithCurrentWord() {
         type: 'definitions',
         word: currentWord
     });
-    if (!response.definitions) {
+    if (!response || !response.definitions) {
         return;
     }
     audioElement = null;
