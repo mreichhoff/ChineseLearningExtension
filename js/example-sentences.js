@@ -18,7 +18,7 @@ async function getSentences(word) {
 async function getSentencesTemplate(word, deckSelectionCallback) {
     const sentencesForWord = await getSentences(word);
     if (!sentencesForWord || sentencesForWord.length === 0) {
-        return html`Sorry, no sentences found.`
+        return html`<div class="sidepanel-information-message">Sorry, no sentences found.</div>`
     }
     return html`<div class="sidepanel-information-message">Example sentences from
         <a class="chineselearningextension-external-link" href="https://tatoeba.org">Tatoeba</a>
