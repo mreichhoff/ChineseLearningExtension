@@ -1,4 +1,4 @@
-import { html, render } from "lit-html"
+import { html } from "lit-html"
 import { parseDefinitions } from "./dictionary"
 
 const ankiConnectBaseUrl = 'http://localhost:8765';
@@ -19,7 +19,6 @@ async function fetchAnkiDecks() {
         return Array.from(Object.entries(responseJson.result))
     } catch (x) {
         // no anki-connect? no ability to add flash cards, but that's ok
-        console.log('error calling anki', x)
         return [];
     }
 }
@@ -51,7 +50,6 @@ async function fetchExistingCards() {
         existingAnkiCards = Object.fromEntries(noteInfoResponseJson.result.map(card => [card.fields.Front.value || card.fields.audio[0].filename, card.fields.Back.value]));
     } catch (x) {
         // no anki-connect? no ability to add flash cards, but that's ok
-        console.log('error calling anki', x)
         return [];
     }
 }

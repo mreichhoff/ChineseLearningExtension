@@ -121,7 +121,6 @@ function getResponseString(aiResponse) {
     if (!aiResponse.choices || aiResponse.choices.length < 1 || !aiResponse.choices[0].message || !aiResponse.choices[0].message.content) {
         return 'ai says no';
     }
-    console.log(aiResponse);
     return JSON.parse(aiResponse.choices[0].message.content);
 }
 
