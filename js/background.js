@@ -37,6 +37,6 @@ chrome.action.onClicked.addListener((tab) => {
     });
     chrome.scripting.insertCSS({
         target: { tabId: tab.id },
-        files: ["css.css"]
+        files: ["content.css"]
     });
 });

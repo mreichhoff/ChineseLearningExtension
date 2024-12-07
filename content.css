@@ -1,0 +1,74 @@
+:root {
+    --chineselearningextension-background-color: #fff;
+    --chineselearningextension-font-color: #000;
+    --chineselearningextension-button-background-color: #121212;
+    --chineselearningextension-button-font-color: #eee;
+    --chineselearningextension-border-color: #3333;
+    --chineselearningextension-link-color: #0083ff;
+    --chineselearningextension-input-background-color: #fff;
+    --chineselearningextension-input-border: 1px solid #333;
+
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --chineselearningextension-background-color: #121212;
+        --chineselearningextension-font-color: #eeee;
+        --chineselearningextension-button-background-color: #eee;
+        --chineselearningextension-button-font-color: #121212;
+        --chineselearningextension-border-color: #9999;
+        --chineselearningextension-link-color: #0ff;
+        --chineselearningextension-input-background-color: #2e2e2e;
+    }
+}
+
+.chineselearningextension-definition-pinyin {
+    font-weight: bold;
+}
+
+.chineselearningextension-definition-number {
+    font-weight: bold;
+}
+
+.chineselearningextension-definitions {
+    font-size: 16px;
+    list-style: none;
+    padding: 0;
+}
+
+.chineselearningextension-popover {
+    inset: auto;
+    background-color: var(--chineselearningextension-background-color);
+    color: var(--chineselearningextension-font-color);
+    width: 400px;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    text-align: left;
+    position: absolute;
+}
+
+.chineselearningextension-popover-header {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 4px;
+    padding: 0;
+}
+
+.chineselearningextension-button {
+    font-size: 14px;
+    line-height: 14px;
+    font-weight: bold;
+    background-color: var(--chineselearningextension-background-color);
+    color: var(--chineselearningextension-font-color);
+    border: 2px solid var(--chineselearningextension-font-color);
+    border-radius: 12px;
+    padding: 4px 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* TODO stop this */
+.chineselearningextension-button.float-right {
+    float: right;
+}
