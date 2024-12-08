@@ -19,6 +19,37 @@ https://github.com/user-attachments/assets/4e88c9bf-3e78-4682-ae68-4926a35d7586
   * Useful links to [Forvo](https://forvo.com/), [Youglish](https://youglish.com/), [HanziGraph](https://hanzigraph.com), and more.
   * Optionally allows for sentence and word analysis with [OpenAI API](https://platform.openai.com/docs/overview) integration (bring-your-own-key).
   * [AnkiConnect](https://foosoft.net/projects/anki-connect/) integration: just one click to add a flash card for definitions, example sentences, or audio cards to improve listening comprehension.
+
+## Integrations
+
+### Anki Connect
+
+Anki connect integration is supported. Setup is described [on their site](https://foosoft.net/projects/anki-connect/). 
+
+Only the default settings are supported for now (no API key requirement, their standard URL, etc.).
+
+The user's list of decks are read and words, sentences, and pronunciations can be added to any of them.
+
+All cards created by the extension are tagged for easy management. To query them, simply run:
+`tag:ChineseLearningExtension` in Anki's card browser.
+
+Better card formatting, and more sophistication with other media types and AI output, is a potential future work item.
+
+### OpenAI
+
+The extension can optionally integrate with OpenAI's API to get word analysis, sentence analysis, and pronunciation.
+
+Although I prefer human-generated content whenever possible, AI provides more flexibility, and its grammar and meaning analysis is often helpful.
+
+[Structured outputs](https://platform.openai.com/docs/guides/structured-outputs) are used to ensure nice formatting and coverage of certain topics,
+though the prompts will continue to be refined. `gpt-4o` is used for text output, and `tts-1` with the `nova` voice for TTS.
+
+### Forvo
+
+A prior version of the code had Forvo API integration, again with a bring-your-own-key model,
+such that human pronunciation could be optionally retrieved and saved in flashcards. Unfortunately, they no longer return CORS headers.
+
+A future work item could be to query a local proxy instead of their API directly. For now, AI voices have replaced it.
  
 ## More Demos and Screenshots
 
