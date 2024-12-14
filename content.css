@@ -34,6 +34,7 @@
     font-size: 16px;
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .chineselearningextension-popover {
@@ -53,6 +54,8 @@
     font-weight: bold;
     margin: 4px;
     padding: 0;
+    color: var(--chineselearningextension-font-color);
+    border: 0;
 }
 
 .chineselearningextension-button {
