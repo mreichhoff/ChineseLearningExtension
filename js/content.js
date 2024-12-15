@@ -4,6 +4,11 @@ import { getDictionaryTemplate, getToneColor } from "./dictionary.js"
 
 const PROCESSED_CLASS = 'chineselearningextension-processed';
 const HAN_REGEX = /[\u2E80-\u2E99\u2E9B-\u2EF3\u2F00-\u2FD5\u3005\u3007\u3021-\u3029\u3038-\u303B\u3400-\u4DB5\u4E00-\u9FD5\uF900-\uFA6D\uFA70-\uFAD9]/;
+const wordSegmenter = new Intl.Segmenter("zh-CN", { granularity: "word" });
+const sentenceSegmenter = new Intl.Segmenter("zh-CN", { granularity: "sentence" });
+let popover;
+let observer;
+
 function processNode(node, modifications) {
     if (node.classList && node.classList.contains(PROCESSED_CLASS)) {
         return;
@@ -24,11 +29,6 @@ function processNode(node, modifications) {
         node.childNodes.forEach(x => processNode(x, modifications))
     }
 }
-
-const popover = document.createElement('div');
-popover.classList.add('chineselearningextension-popover');
-popover.popover = 'auto';
-document.body.appendChild(popover);
 
 function openSidePanel(word, sentence) {
     chrome.runtime.sendMessage({ type: 'open-learn-more', word, sentence });
@@ -124,20 +124,10 @@ function cancelHidePopover() {
     pendingHideTimeout = null;
 }
 
-popover.addEventListener('mouseenter', function () {
-    cancelHidePopover();
-});
-popover.addEventListener('mouseleave', function () {
-    triggerHidePopover();
-});
-
 // TODO: sentence segmenter treats these weird in chinese...
 function stripTokenizerArtifacts(sentence) {
     return sentence.replace(/《$/, '').replace(/^》/, '');
 }
-
-const wordSegmenter = new Intl.Segmenter("zh-CN", { granularity: "word" });
-const sentenceSegmenter = new Intl.Segmenter("zh-CN", { granularity: "sentence" });
 
 function addTones() {
     let modifications = [];
@@ -203,12 +193,26 @@ function addTones() {
     });
 }
 
-addTones();
+// if the popover has already been added, no-op.
+if (document.getElementsByClassName('chineselearningextension-popover').length === 0) {
+    popover = document.createElement('div');
+    popover.classList.add('chineselearningextension-popover');
+    popover.popover = 'auto';
+    document.body.appendChild(popover);
 
-const mutationConfig = { childList: true, subtree: true };
+    popover.addEventListener('mouseenter', function () {
+        cancelHidePopover();
+    });
+    popover.addEventListener('mouseleave', function () {
+        triggerHidePopover();
+    });
+    addTones();
 
-// Create an observer instance linked to the callback function
-const observer = new MutationObserver(addTones);
+    const mutationConfig = { childList: true, subtree: true };
 
-// Start observing the target node for configured mutations
-observer.observe(document.body, mutationConfig);
+    // Create an observer instance linked to the callback function
+    observer = new MutationObserver(addTones);
+
+    // Start observing the target node for configured mutations
+    observer.observe(document.body, mutationConfig);
+}
