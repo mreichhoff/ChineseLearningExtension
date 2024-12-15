@@ -109,6 +109,7 @@ function overrideTones(word) {
     return result;
 }
 
+let pendingShowTimeout;
 let pendingHideTimeout;
 function triggerHidePopover() {
     if (pendingHideTimeout) {
@@ -122,6 +123,11 @@ function triggerHidePopover() {
 function cancelHidePopover() {
     clearTimeout(pendingHideTimeout);
     pendingHideTimeout = null;
+}
+
+function cancelShowPopover() {
+    clearTimeout(pendingShowTimeout);
+    pendingShowTimeout = null;
 }
 
 // TODO: sentence segmenter treats these weird in chinese...
@@ -169,19 +175,23 @@ function addTones() {
                     i++;
                 }
                 wrapper.addEventListener('mouseenter', async function () {
+                    cancelShowPopover();
                     const response = await chrome.runtime.sendMessage({ type: 'definitions', word: segment });
                     // unclear in what cases response is null or undefined, but it does happen. Being defensive.
                     if (!response || !response.definitions) {
                         return;
                     }
                     cancelHidePopover();
-                    const boundingBox = wrapper.getBoundingClientRect();
-                    popover.style.left = `${Math.max(boundingBox.left + window.scrollX - 50, 0)}px`;
-                    popover.style.top = `${boundingBox.bottom + window.scrollY}px`;
-                    render(getDictionaryTemplate(segment, response.definitions, sentence, openSidePanel), popover);
-                    popover.showPopover();
+                    pendingShowTimeout = setTimeout(function () {
+                        const boundingBox = wrapper.getBoundingClientRect();
+                        popover.style.left = `${Math.max(boundingBox.left + window.scrollX - 50, 0)}px`;
+                        popover.style.top = `${boundingBox.bottom + window.scrollY}px`;
+                        render(getDictionaryTemplate(segment, response.definitions, sentence, openSidePanel), popover);
+                        popover.showPopover()
+                    }, 500);
                 });
                 wrapper.addEventListener('mouseleave', function () {
+                    cancelShowPopover();
                     triggerHidePopover();
                 });
                 mod.parent.insertBefore(wrapper, mod.nextSibling);
@@ -202,6 +212,7 @@ if (document.getElementsByClassName('chineselearningextension-popover').length =
 
     popover.addEventListener('mouseenter', function () {
         cancelHidePopover();
+        cancelShowPopover();
     });
     popover.addEventListener('mouseleave', function () {
         triggerHidePopover();
