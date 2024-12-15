@@ -46,11 +46,17 @@
                     href="https://docs.ankiweb.net/getting-started.html">Anki's guide</a> for general information about
                 Anki.
             </p>
-            <p id="anki-connect-info"
-                class="chineselearningextension-result-message"></p>
+            <p class="anki-connect-key" style="display:none">
+                An Anki Connect key is required, and can be found in Tools > Add-ons > AnkiConnect > Config.
+            </p>
             <p>
+                <label class="anki-connect-key" style="display:none">
+                    AnkiConnect Key:
+                    <input type="text" name="anki-connect-key" id="anki-connect-key" placeholder="Anki Connect Key" />
+                </label>
                 <button id="check-anki-connect-status" class="chineselearningextension-button">Check Status</button>
             </p>
+            <p id="anki-connect-info" class="chineselearningextension-result-message"></p>
         </div>
         <div>
             <h2>OpenAI</h2>

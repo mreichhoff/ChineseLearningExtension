@@ -4,15 +4,34 @@ import { parseDefinitions } from "./dictionary"
 const ankiConnectBaseUrl = 'http://localhost:8765';
 
 let existingAnkiCards = [];
+let ankiConnectKey;
+
+async function requestPermission() {
+    try {
+        const ankiConnectResponse = await fetch(ankiConnectBaseUrl, {
+            body: JSON.stringify({
+                "action": "requestPermission",
+                "version": 6
+            }), method: 'POST'
+        });
+        const responseJson = await ankiConnectResponse.json();
+        return responseJson.result;
+    } catch (x) {
+        // no anki-connect? no ability to add flash cards, but that's ok
+        return false;
+    }
+}
 
 async function fetchAnkiDecks() {
+    let request = {
+        "action": "deckNamesAndIds",
+        "version": 6
+    }
+    maybeAddAnkiConnectKey(request);
     try {
         // TODO: combine with callAnkiConnect
         const ankiConnectResponse = await fetch(ankiConnectBaseUrl, {
-            body: JSON.stringify({
-                "action": "deckNamesAndIds",
-                "version": 6
-            }), method: 'POST'
+            body: JSON.stringify(request), method: 'POST'
         });
         const responseJson = await ankiConnectResponse.json();
         // TODO: what does the deck ID do? name appears used at least in addNote
@@ -23,28 +42,38 @@ async function fetchAnkiDecks() {
     }
 }
 
+function maybeAddAnkiConnectKey(request) {
+    if (ankiConnectKey) {
+        request['key'] = ankiConnectKey;
+    }
+}
+
 async function fetchExistingCards() {
+    let notesRequest = {
+        "action": "findNotes",
+        "version": 6,
+        "params": {
+            "query": "tag:ChineseLearningExtension"
+        }
+    };
+    maybeAddAnkiConnectKey(notesRequest);
     try {
         // TODO: combine with callAnkiConnect
         const findNotesResponse = await fetch(ankiConnectBaseUrl, {
-            body: JSON.stringify({
-                "action": "findNotes",
-                "version": 6,
-                "params": {
-                    "query": "tag:ChineseLearningExtension"
-                }
-            }), method: 'POST'
+            body: JSON.stringify(notesRequest), method: 'POST'
         });
         const responseJson = await findNotesResponse.json();
         const existingCardsFromExtension = responseJson.result;
+        let noteInfoRequest = {
+            "action": "notesInfo",
+            "version": 6,
+            "params": {
+                "notes": existingCardsFromExtension
+            }
+        };
+        maybeAddAnkiConnectKey(noteInfoRequest);
         const noteInfoResponse = await fetch(ankiConnectBaseUrl, {
-            body: JSON.stringify({
-                "action": "notesInfo",
-                "version": 6,
-                "params": {
-                    "notes": existingCardsFromExtension
-                }
-            }), method: 'POST'
+            body: JSON.stringify(noteInfoRequest), method: 'POST'
         });
         const noteInfoResponseJson = await noteInfoResponse.json();
         existingAnkiCards = Object.fromEntries(noteInfoResponseJson.result.map(card => [card.fields.Front.value, card.fields.Back.value]));
@@ -183,6 +212,7 @@ async function makeSentenceCard(word, sentence, deck) {
 }
 
 async function callAnkiConnect(request) {
+    maybeAddAnkiConnectKey(request);
     const ankiConnectResponse = await fetch(ankiConnectBaseUrl, {
         body: JSON.stringify(request),
         method: 'POST'
@@ -242,4 +272,8 @@ function getAnkiTemplate(word, cardRequest, cardType, deckSelectionCallback) {
     </div>`;
 }
 
-export { getAnkiTemplate, fetchAnkiDecks, fetchExistingCards, CardType }
+function setAnkiConnectKey(key) {
+    ankiConnectKey = key;
+}
+
+export { requestPermission, setAnkiConnectKey, getAnkiTemplate, fetchAnkiDecks, fetchExistingCards, CardType }

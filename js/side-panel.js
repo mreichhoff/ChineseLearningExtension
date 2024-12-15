@@ -1,6 +1,6 @@
 import { html, render } from 'lit-html';
 import { getDictionaryTemplate } from './dictionary';
-import { getAnkiTemplate, CardType, fetchAnkiDecks, fetchExistingCards } from "./anki";
+import { getAnkiTemplate, CardType, fetchAnkiDecks, fetchExistingCards, setAnkiConnectKey } from "./anki";
 import { callForvo } from "./forvo-client"
 import { getSentencesTemplate } from './example-sentences';
 import { renderExternalLinks } from './links';
@@ -81,16 +81,20 @@ chrome.storage.session.get().then(items => {
     currentSentence = items.sentence;
     currentForvoKey = items.forvoKey;
     currentOpenAiKey = items.openAiKey;
+    setAnkiConnectKey(items.ankiConnectKey);
     updateWithCurrentWord();
 });
 
 chrome.storage.session.onChanged.addListener(async (changes) => {
-    if (changes['forvoKey'] || changes['openAiKey']) {
+    if (changes['forvoKey'] || changes['openAiKey'] || changes['ankiConnectKey']) {
         if (changes['forvoKey']) {
             currentForvoKey = changes['forvoKey'].newValue;
         }
         if (changes['openAiKey']) {
             currentOpenAiKey = changes['openAiKey'].newValue;
+        }
+        if (changes['ankiConnectKey']) {
+            setAnkiConnectKey(changes['ankiConnectKey'].newValue);
         }
         return;
     }
