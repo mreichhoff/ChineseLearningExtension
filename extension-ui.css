@@ -43,6 +43,7 @@
     font-size: 14px;
 }
 
+select,
 .options-page input[type=text] {
     background-color: var(--chineselearningextension-input-background-color);
     border: var(--chineselearningextension-input-border);
