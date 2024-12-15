@@ -29,8 +29,8 @@ chrome.storage.session.get().then(items => {
         renderAnkiConnectStatus();
         return;
     }
-    openAiField.value = items.openAiKey;
-    ankiConnectKeyInput.value = items.ankiConnectKey;
+    openAiField.value = items.openAiKey || '';
+    ankiConnectKeyInput.value = items.ankiConnectKey || '';
     setAnkiConnectKey(items.ankiConnectKey);
     renderAnkiConnectStatus();
 });
@@ -39,6 +39,8 @@ async function renderAnkiConnectStatus() {
     const permissionResult = await requestPermission();
     if (!permissionResult || permissionResult.permission === 'denied') {
         ankiConnectField.innerText = `Could not reach AnkiConnect. You may need to install it or grant permissions.`;
+        // i know i shouldn't
+        ankiConnectField.style.border = '4px solid #ff635f';
         return;
     }
     if (permissionResult.requireApikey) {
@@ -54,14 +56,19 @@ async function renderAnkiConnectStatus() {
         const existingCards = await fetchExistingCards();
         ankiConnectField.innerText = `Successfully connected to AnkiConnect.
         Found ${decks.length} existing decks, and ${Object.entries(existingCards).length} cards created by ChineseLearningExtension.`;
+        ankiConnectField.style.border = '4px solid #66c42b';
     } else {
         ankiConnectField.innerText = `Either could not reach AnkiConnect, or no decks found. See above for instructions.`;
+        ankiConnectField.style.border = '4px solid #ff635f';
     }
 }
 
 ankiConnectStatusCheckButton.addEventListener('click', async function (event) {
     event.preventDefault();
     event.stopImmediatePropagation();
+    await chrome.storage.session.set({
+        'ankiConnectKey': ankiConnectKeyInput.value
+    });
     setAnkiConnectKey(ankiConnectKeyInput.value);
     await renderAnkiConnectStatus();
 });

@@ -51,6 +51,10 @@ select,
     font-size: 16px;
 }
 
+#anki-connect-info {
+    padding: 4px;
+}
+
 .chineselearningextension-side-panel-header {
     text-align: center;
 }
