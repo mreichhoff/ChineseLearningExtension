@@ -14,5 +14,8 @@ No other party receives that key or other information as part of your use of the
 is run locally, and no account is required to use the extension.
 
 The Anki Connect integration can also result in cards you choose to make being added to Anki, which has sync functionality,
-but that is also optional and outside the scope of the extension's functionality. No Anki Connect data is collected, and only
-their default localhost URL and port (8765) are supported.
+but that is also optional and outside the scope of the extension's functionality. If you configure Anki Connect to require
+a key, you can also store that data in
+[Chrome's extension session storage](https://developer.chrome.com/docs/extensions/reference/api/storage#property-session)
+via setting it in the options page. Because only the default Anki Connect URL (localhost:8765) is supported, that key is not transmitted
+outside localhost.
