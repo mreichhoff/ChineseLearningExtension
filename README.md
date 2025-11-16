@@ -10,6 +10,16 @@ https://github.com/user-attachments/assets/4e88c9bf-3e78-4682-ae68-4926a35d7586
 
 ## Installation
 
+```
+git clone git@github.com:mreichhoff/ChineseLearningExtension.git
+cd ChineseLearningExtension
+npm install
+npm run build
+# Open chrome://extensions/
+# Enable "Developer mode" (toggle in top right)
+# "Load unpacked"
+# Select the ChineseLearningExtension folder
+```
 
 ## Features
 
