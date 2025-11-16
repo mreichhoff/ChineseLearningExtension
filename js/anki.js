@@ -5,6 +5,7 @@ const ankiConnectBaseUrl = 'http://localhost:8765';
 
 let existingAnkiCards = [];
 let ankiConnectKey;
+let disabled = false;
 
 async function requestPermission() {
     try {
@@ -15,14 +16,25 @@ async function requestPermission() {
             }), method: 'POST'
         });
         const responseJson = await ankiConnectResponse.json();
+        disabled = false;
         return responseJson.result;
     } catch (x) {
         // no anki-connect? no ability to add flash cards, but that's ok
+        disabled = true;
         return false;
     }
 }
 
 async function fetchAnkiDecks() {
+    // on Windows, fetching a closed port on localhost is very slow.
+    // avoid making the call if it fails once.
+    // the user is still able to go into options and get anki up and running. A successful call
+    // will get it set back to enabled.
+    // I could also use AbortSignal or something, but setting up hardcoded timeouts feels worse.
+    // admittedly this still isn't a great experience, as your first request would be slow.
+    if (disabled) {
+        return [];
+    }
     let request = {
         "action": "deckNamesAndIds",
         "version": 6
@@ -34,10 +46,13 @@ async function fetchAnkiDecks() {
             body: JSON.stringify(request), method: 'POST'
         });
         const responseJson = await ankiConnectResponse.json();
+        disabled = false;
         // TODO: what does the deck ID do? name appears used at least in addNote
         return Array.from(Object.entries(responseJson.result))
     } catch (x) {
-        // no anki-connect? no ability to add flash cards, but that's ok
+        // no anki-connect? no ability to add flash cards, but that's ok.
+        // if it fails once, let the user go into options and retry.
+        disabled = true;
         return [];
     }
 }
@@ -49,6 +64,9 @@ function maybeAddAnkiConnectKey(request) {
 }
 
 async function fetchExistingCards() {
+    if (disabled) {
+        return {};
+    }
     let notesRequest = {
         "action": "findNotes",
         "version": 6,
@@ -77,10 +95,12 @@ async function fetchExistingCards() {
         });
         const noteInfoResponseJson = await noteInfoResponse.json();
         existingAnkiCards = Object.fromEntries(noteInfoResponseJson.result.map(card => [card.fields.Front.value, card.fields.Back.value]));
+        disabled = false;
         // TODO hydrate and also return....probably not great
         return existingAnkiCards;
     } catch (x) {
         // no anki-connect? no ability to add flash cards, but that's ok
+        disabled = true;
         return {};
     }
 }
