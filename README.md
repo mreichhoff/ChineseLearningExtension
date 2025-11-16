@@ -2,6 +2,8 @@
 
 A Chrome extension for learners of the Chinese language. Provides tone color coding, a pop-up dictionary, word definitions, example sentences, useful links, and AI analysis on any sentence on any web page. Also integrated with [Anki](https://apps.ankiweb.net/) to support one-click flashcard creation for new words, sentences, or pronunciations.
 
+Check it out on the [Chrome Web Store](https://chromewebstore.google.com/detail/chinese-learning-extensio/ldjilgjcllhinlcodlfdohbnenfbbnlj)
+
 ## Demo
 
 
