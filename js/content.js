@@ -9,6 +9,16 @@ const sentenceSegmenter = new Intl.Segmenter("zh-CN", { granularity: "sentence" 
 let popover;
 let observer;
 
+function isVisibleNode(node) {
+    if (node.nodeName === 'SCRIPT' || node.nodeName === 'STYLE' || node.nodeName === 'META') {
+        return false;
+    }
+    if (node.style && (node.style.display === 'none' || node.style.visibility === 'hidden')) {
+        return false;
+    }
+    return true;
+}
+
 function processNode(node, modifications) {
     if (node.classList && node.classList.contains(PROCESSED_CLASS)) {
         return;
@@ -16,7 +26,7 @@ function processNode(node, modifications) {
     if (node === popover) {
         return;
     }
-    if (node.nodeType === node.TEXT_NODE && node.textContent.match(HAN_REGEX)) {
+    if (isVisibleNode(node) && node.nodeType === node.TEXT_NODE && node.textContent.match(HAN_REGEX)) {
         // will ordering just work?
         const parent = node.parentNode;
         const nextSibling = node.nextSibling;
@@ -25,7 +35,7 @@ function processNode(node, modifications) {
         return;
     }
     //need iframe handling, ideally node type allowlist but that'll be rough
-    if (node.nodeName !== "SCRIPT") {
+    if (isVisibleNode(node)) {
         node.childNodes.forEach(x => processNode(x, modifications))
     }
 }
@@ -143,7 +153,6 @@ function addTones() {
     modifications.forEach(mod => {
         mod.parent.removeChild(mod.node);
         const fullText = mod.node.textContent;
-
         const segments = wordSegmenter.segment(fullText);
         const sentences = Array.from(sentenceSegmenter.segment(fullText));
         const segmentsAdjustedForDictionary = hackAroundDictionaryTokenizerMismatch(segments);
