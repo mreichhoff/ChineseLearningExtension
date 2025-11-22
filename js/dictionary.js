@@ -22,7 +22,7 @@ function parseDefinitions(definitionList) {
 }
 
 function getToneColor(tone) {
-    return tone === '1' ? '#ff635f' : tone === '2' ? '#66c42b' : tone === '3' ? '#de68ee' : tone === '4' ? '#68aaee' : '#888';
+    return tone === '1' ? '#ff0d0d' : tone === '2' ? '#00ab3f' : tone === '3' ? '#c800ff' : tone === '4' ? '#007bff' : '#888';
 }
 
 function renderPinyin(pinyin) {
