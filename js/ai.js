@@ -22,7 +22,7 @@ async function explainSentence(sentence, key) {
             },
             {
                 "role": "user",
-                "content": `Please briefly explain, in English, the grammar of the sentence "${sentence}"`
+                "content": `Please briefly translate and explain, in English, the grammar of the sentence "${sentence}"`
             }
         ],
         "response_format": {
@@ -32,6 +32,12 @@ async function explainSentence(sentence, key) {
                 "schema": {
                     "type": "object",
                     "properties": {
+                        "englishTranslation": {
+                            "type": "string"
+                        },
+                        "pinyin": {
+                            "type": "string"
+                        },
                         "grammar_points": {
                             "type": "array", "items": { "type": "string" }
                         },
@@ -48,7 +54,7 @@ async function explainSentence(sentence, key) {
                             }
                         }
                     },
-                    "required": ["grammar_points", "word_by_word"],
+                    "required": ["englishTranslation", "pinyin", "grammar_points", "word_by_word"],
                     "additionalProperties": false
                 },
                 "strict": true
@@ -197,7 +203,11 @@ function renderAiTab(word, sentence, key, deckSelectionCallback, responseContain
             spinner.removeAttribute('style');
             const aiResponse = await explainSentence(sentence, key);
             const structuredResponse = getResponseString(aiResponse);
-            render(html`<h3>Word-by-word</h3>
+            render(html`
+            <h3>Translated</h3>
+            <div class="translation">${structuredResponse.englishTranslation}</div>
+            <div class="pinyin" style="margin-top:6px">${structuredResponse.pinyin}</div>
+            <h3>Word-by-word</h3>
             <ul class="explanation-list">${structuredResponse.word_by_word.map(wordExplanation =>
                 html`<li>
                 <span class="target-sentence">${wordExplanation.word}: </span><span class="translation">${wordExplanation.meaning}</span>
@@ -205,7 +215,8 @@ function renderAiTab(word, sentence, key, deckSelectionCallback, responseContain
             <h3>Grammar Points</h3>
             <ul class="explanation-list">${structuredResponse.grammar_points.map(point =>
                     html`<li>${point}</li>`)}
-            </ul>`, responseContainer);
+            </ul>
+            <div>${getAnkiTemplate(word, { sentence: { zh: structuredResponse.word_by_word.map(x => x.word), pinyin: structuredResponse.pinyin, en: structuredResponse.englishTranslation } }, CardType.Sentence, deckSelectionCallback)}</div>`, responseContainer);
             spinner.style.display = 'none';
         }}>Analyze Sentence</button>
         <button class="chineselearningextension-button" @click=${async function (e) {
