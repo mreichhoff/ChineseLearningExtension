@@ -10,6 +10,7 @@ const ankiConnectStatusCheckButton = document.getElementById('check-anki-connect
 const ankiConnectKeyInput = document.getElementById('anki-connect-key');
 
 const popoverDelayField = document.getElementById('popover-delay');
+const immersionModeCheckbox = document.getElementById('immersion-mode');
 
 integrationsForm.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -21,6 +22,7 @@ integrationsForm.addEventListener('submit', function (e) {
     };
     const nonsensitiveData = {
         'popoverDelay': parseInt(popoverDelayField.value),
+        'immersionMode': immersionModeCheckbox.checked,
     };
 
     Promise.all([
@@ -50,6 +52,7 @@ chrome.storage.session.get().then(items => {
 
 chrome.storage.sync.get().then(items => {
     popoverDelayField.value = items.popoverDelay || 500;
+    immersionModeCheckbox.checked = items.immersionMode || false;
 })
 
 async function renderAnkiConnectStatus() {
